@@ -47,6 +47,7 @@ PASSTHROUGH_FIELDS = [
     "candidate_required_snippet_ratio",
     "candidate_forbidden_ok",
     "candidate_preview_path",
+    "candidate_preview_frame",
     "rating_decision",
     "human_rating",
     "human_notes",
@@ -58,6 +59,11 @@ PASSTHROUGH_FIELDS = [
     "openrouter_generation_id",
     "openrouter_response_model",
     "sample_index",
+    "style_id",
+    "style_name",
+    "style_family",
+    "audience",
+    "visual_contract",
 ]
 
 

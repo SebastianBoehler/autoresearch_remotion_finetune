@@ -19,7 +19,9 @@ CANDIDATE_SYSTEM_PROMPT = (
     f"{DEFAULT_SYSTEM_PROMPT} Make the animation visually polished, deterministic, "
     "and self-contained. Do not use CSS transitions, external network data, browser globals, "
     "arbitrary third-party packages, or Remotion Composition registrations. Export the visual "
-    "component itself, not a Root or Composition wrapper."
+    "component itself, not a Root or Composition wrapper. Maintain strong contrast: primary "
+    "text should be clearly readable at 1280x720 preview size, essential labels should not use "
+    "opacity below 0.72, and the midpoint frame should show the main artifact clearly."
 )
 
 
@@ -124,10 +126,11 @@ def _generate_one(
         sample_index=sample_index,
         preview_path=preview_path.relative_to(output_dir),
     )
+    preview_frame = _preview_frame(case, runtime)
     check = run_remotion_check(
         code=code,
         repo_root=repo_root,
-        runtime=runtime,
+        runtime=_runtime_with_preview_frame(runtime, preview_frame),
         duration_in_frames=case["duration_in_frames"],
         fps=case["fps"],
         width=case["width"],
@@ -141,6 +144,7 @@ def _generate_one(
     forbidden_ok = _forbidden_snippets_ok(case)
     case["candidate_compile_ok"] = check.compile_ok
     case["candidate_render_ok"] = check.render_ok
+    case["candidate_preview_frame"] = preview_frame
     case["candidate_required_snippet_ratio"] = required_ratio
     case["candidate_forbidden_ok"] = forbidden_ok
     if not check.compile_ok or check.render_ok is False or required_ratio < 1 or not forbidden_ok:
@@ -199,6 +203,7 @@ def _candidate_case(
         "candidate_required_snippet_ratio": None,
         "candidate_forbidden_ok": None,
         "candidate_preview_path": str(preview_path),
+        "candidate_preview_frame": None,
         "rating_decision": "unrated",
         "human_rating": None,
         "human_notes": "",
@@ -210,6 +215,11 @@ def _candidate_case(
         "openrouter_generation_id": result.response_id,
         "openrouter_response_model": result.response_model,
         "sample_index": sample_index,
+        "style_id": prompt.get("style_id"),
+        "style_name": prompt.get("style_name"),
+        "style_family": prompt.get("style_family"),
+        "audience": prompt.get("audience"),
+        "visual_contract": prompt.get("visual_contract"),
     }
 
 
@@ -226,6 +236,26 @@ def _required_snippet_ratio(case: dict[str, Any]) -> float:
 
 def _forbidden_snippets_ok(case: dict[str, Any]) -> bool:
     return all(snippet not in case["completion"] for snippet in case.get("must_not_contain", []))
+
+
+def _preview_frame(case: dict[str, Any], runtime: RemotionRuntimeConfig) -> int:
+    if runtime.render_mode != "still":
+        return runtime.render_frame
+    duration = int(case.get("duration_in_frames") or 90)
+    return max(1, min(duration - 1, duration // 2))
+
+
+def _runtime_with_preview_frame(
+    runtime: RemotionRuntimeConfig,
+    preview_frame: int,
+) -> RemotionRuntimeConfig:
+    return RemotionRuntimeConfig(
+        runner_dir=runtime.runner_dir,
+        composition_id=runtime.composition_id,
+        render_mode=runtime.render_mode,
+        render_frame=preview_frame,
+        output_extension=runtime.output_extension,
+    )
 
 
 def _verification_payload(prompt_path: Path, verification: list[dict[str, Any]]) -> dict[str, Any]:

@@ -36,9 +36,11 @@ Keeping the first target narrow makes automated verification practical and gives
 - `docs/dataset-strategy.md`: licensing and data-source plan
 - `docs/eval-and-rendering.md`: render verification and backend integration plan
 - `docs/rating-workflow.md`: OpenRouter candidate generation and human rating flow
+- `docs/prompt-template.md`: style-aware prompt template for learning artifacts
 - `scripts/export_prompt_history_to_cases.py`: converts prompt-to-motion-graphics history exports into training cases
 - `scripts/build_codex_synthetic_dataset.py`: builds the Codex-authored synthetic JSONL dataset from readable TSX templates
 - `data/generation_prompts/`: first-party prompt bank for remote candidate generation
+- `data/style_profiles/`: style profiles used to expand learning-app prompts
 - `data/synthetic/`: synthetic dataset manifest and template completions
 - `data/remotion_codex_synthetic_cases.jsonl`: current canonical synthetic training source
 - `data/remotion_seed_cases.json`: starter local seed set
@@ -85,9 +87,11 @@ uv run python -m remotion_pipeline.cli verify-source \
 Generate remote model candidates for human rating:
 
 ```bash
+uv run python scripts/build_style_prompt_bank.py
+
 uv run python -m remotion_pipeline.cli generate-candidates \
   --config configs/qwen25coder_3b_remotion.json \
-  --prompts data/generation_prompts/remotion_learning_app_prompts.jsonl \
+  --prompts data/generation_prompts/remotion_learning_app_style_prompts.jsonl \
   --output-dir artifacts/candidates/learning-app-v1 \
   --model "<openrouter-model-id>" \
   --samples-per-prompt 1 \

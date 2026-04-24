@@ -18,7 +18,9 @@ Use these sources first:
 
 - `data/remotion_seed_cases.json`: small, hand-authored seed cases owned by this repo.
 - `data/remotion_codex_synthetic_cases.jsonl`: current Codex-authored synthetic v1 dataset generated from readable templates.
-- `data/generation_prompts/remotion_learning_app_prompts.jsonl`: first-party prompt bank for OpenRouter candidate generation.
+- `data/generation_prompts/remotion_learning_app_base_prompts.jsonl`: first-party learning-app artifact prompts.
+- `data/generation_prompts/remotion_learning_app_style_prompts.jsonl`: generated cross-product of base prompts and style profiles.
+- `data/style_profiles/remotion_learning_styles.json`: style profiles for clean light, academic, business, colorful, dark, and mobile artifacts.
 - Prompt-history exports from your learning-app or Remotion prompt app, converted via `scripts/export_prompt_history_to_cases.py`.
 - Codex-generated examples that are reviewed, rendered, deduplicated, and tagged with `license: MIT` only when they do not copy protected third-party examples.
 

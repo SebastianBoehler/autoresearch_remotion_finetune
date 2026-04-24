@@ -9,7 +9,7 @@ Use any OpenRouter model IDs you want to compare. Keep model names explicit in t
 ```bash
 uv run python -m remotion_pipeline.cli generate-candidates \
   --config configs/qwen25coder_3b_remotion.json \
-  --prompts data/generation_prompts/remotion_learning_app_prompts.jsonl \
+  --prompts data/generation_prompts/remotion_learning_app_style_prompts.jsonl \
   --output-dir artifacts/candidates/learning-app-v1 \
   --model "<xiaomi-pro-openrouter-model-id>" \
   --model "<gpt-5.5-openrouter-model-id>" \
@@ -38,6 +38,8 @@ Use this scale:
 - `1`: broken, ugly, or should not be learned.
 
 Set `human_rating` and optionally `human_notes`. You can also set `rating_decision` to `accept` or `reject`.
+
+Rate contrast and readability aggressively. A pretty frame with unreadable text should not get promoted.
 
 ## Promote
 

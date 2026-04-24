@@ -1,0 +1,52 @@
+{
+  "styles": [
+    {
+      "style_id": "clean_light",
+      "name": "Clean Light Learning UI",
+      "family": "light",
+      "audience": "general learners",
+      "tags": ["style", "light", "clean", "high-contrast"],
+      "prompt": "Use a bright off-white or white background, black or near-black primary text, generous spacing, crisp cards, one restrained blue or green accent, and no low-contrast gray labels. Aim for Apple-like clarity and readable learning-app UI."
+    },
+    {
+      "style_id": "academic_editorial",
+      "name": "Academic Editorial",
+      "family": "academic",
+      "audience": "university learners",
+      "tags": ["style", "academic", "editorial", "serif"],
+      "prompt": "Use an academic editorial style with cream paper background, dark ink typography, subtle rules, diagram annotations, and a calm scholarly palette. Keep formulas and labels large, legible, and precise."
+    },
+    {
+      "style_id": "business_dashboard",
+      "name": "Business Dashboard",
+      "family": "business",
+      "audience": "professional learners",
+      "tags": ["style", "business", "dashboard", "presentation"],
+      "prompt": "Use a polished business presentation style: light neutral background, navy or charcoal headings, compact KPI cards, precise chart geometry, thin grid lines, and one premium accent color. Avoid playful colors and avoid tiny axis labels."
+    },
+    {
+      "style_id": "colorful_student",
+      "name": "Colorful Student",
+      "family": "colorful",
+      "audience": "younger learners",
+      "tags": ["style", "colorful", "student", "friendly"],
+      "prompt": "Use a friendly colorful style with pastel panels, bold readable headings, rounded shapes, playful but controlled accents, and clear visual hierarchy. Keep backgrounds light enough that text remains very readable."
+    },
+    {
+      "style_id": "premium_dark",
+      "name": "Premium Dark Contrast",
+      "family": "dark",
+      "audience": "focused learners",
+      "tags": ["style", "dark", "premium", "high-contrast"],
+      "prompt": "Use a dark premium interface only if contrast stays excellent: near-black background, white primary text, bright cyan or amber accents, visible grid/diagram strokes, and no essential text below 80% opacity."
+    },
+    {
+      "style_id": "mobile_card",
+      "name": "Mobile Learning Card",
+      "family": "mobile",
+      "audience": "mobile app users",
+      "tags": ["style", "mobile", "card", "app"],
+      "prompt": "Use a mobile-first card style with safe margins, large tap-target-like panels, strong title hierarchy, readable body copy, rounded containers, and a clear final state suitable for a learning app artifact."
+    }
+  ]
+}
