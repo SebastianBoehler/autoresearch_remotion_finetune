@@ -1,0 +1,109 @@
+{
+  "description": "Codex-authored synthetic Remotion code-generation cases. The public Remotion docs and local Remotion skill rules are used for principles only; completions are first-party authored templates.",
+  "inspiration_sources": [
+    "Remotion docs: AI code generation",
+    "Remotion docs: renderStill/renderMedia/selectComposition",
+    "Remotion skill rules: animations",
+    "Remotion skill rules: charts",
+    "Remotion skill rules: sequencing",
+    "Remotion skill rules: text-animations"
+  ],
+  "cases": [
+    {
+      "case_id": "synthetic_lesson_typewriter",
+      "prompt": "Create a square Remotion lesson intro with a dark background, a typewriter headline about gradient descent, a blinking cursor, and a delayed subtitle fade-in.",
+      "template_path": "templates/lesson_typewriter.tsx",
+      "tags": ["synthetic-v1", "typography", "lesson", "typewriter", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "useVideoConfig", "interpolate", "slice("],
+      "must_not_contain": ["setTimeout(", "animation", "transition", "Math.random"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1080,
+      "height": 1080
+    },
+    {
+      "case_id": "synthetic_retention_waterfall",
+      "prompt": "Create a Remotion bar chart that reveals a four-stage learning funnel with staggered bar growth, warm paper background, and teal bars.",
+      "template_path": "templates/retention_waterfall.tsx",
+      "tags": ["synthetic-v1", "chart", "dashboard", "funnel", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "Easing", "map("],
+      "must_not_contain": ["fetch(", "axios", "document.", "window."],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_chat_bubble_stagger",
+      "prompt": "Create a Remotion chat UI animation for a study coach conversation with alternating left and right bubbles and spring-staggered entrances.",
+      "template_path": "templates/chat_bubble_stagger.tsx",
+      "tags": ["synthetic-v1", "chat", "ui", "coach", "duration:4s"],
+      "must_contain": ["spring", "useCurrentFrame", "useVideoConfig", "map("],
+      "must_not_contain": ["setInterval(", "setTimeout(", "transition", "animation"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_radial_mastery_meter",
+      "prompt": "Create a dark Remotion radial progress meter that animates mastery from zero to eighty-two percent using an SVG circle stroke.",
+      "template_path": "templates/radial_mastery_meter.tsx",
+      "tags": ["synthetic-v1", "svg", "progress", "dashboard", "duration:3s"],
+      "must_contain": ["strokeDashoffset", "interpolate", "useCurrentFrame", "svg"],
+      "must_not_contain": ["fetch(", "Math.random", "document.", "window."],
+      "duration_in_frames": 90,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_concept_orbit_loop",
+      "prompt": "Create a Remotion abstract concept loop with four labeled nodes orbiting around a central learning loop badge on a dark background.",
+      "template_path": "templates/concept_orbit_loop.tsx",
+      "tags": ["synthetic-v1", "abstract", "loop", "concept", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "Math.sin", "Math.cos", "map("],
+      "must_not_contain": ["Math.random", "transition", "animation", "setTimeout("],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_quiz_answer_reveal",
+      "prompt": "Create a Remotion multiple-choice quiz card where the correct answer lifts and gets a green border after a short delay.",
+      "template_path": "templates/quiz_answer_reveal.tsx",
+      "tags": ["synthetic-v1", "quiz", "education", "ui", "duration:3s"],
+      "must_contain": ["spring", "useCurrentFrame", "useVideoConfig", "map("],
+      "must_not_contain": ["fetch(", "axios", "transition", "animation"],
+      "duration_in_frames": 90,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_roadmap_sequence",
+      "prompt": "Create a Remotion roadmap animation with three large cards appearing in sequence using Sequence and spring entrance motion.",
+      "template_path": "templates/roadmap_sequence.tsx",
+      "tags": ["synthetic-v1", "sequence", "roadmap", "cards", "duration:4s"],
+      "must_contain": ["Sequence", "premountFor", "spring", "useCurrentFrame"],
+      "must_not_contain": ["setTimeout(", "Math.random", "transition", "animation"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_feature_stack",
+      "prompt": "Create a Remotion feature stack animation for a learning app with three overlapping cards and staggered spring entrances.",
+      "template_path": "templates/feature_stack.tsx",
+      "tags": ["synthetic-v1", "product", "cards", "ui", "duration:4s"],
+      "must_contain": ["spring", "useCurrentFrame", "useVideoConfig", "map("],
+      "must_not_contain": ["fetch(", "axios", "transition", "animation"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    }
+  ]
+}

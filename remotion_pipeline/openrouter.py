@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import time
+from dataclasses import dataclass
 from typing import Any
 
 import requests
@@ -10,6 +11,15 @@ from remotion_pipeline.types import BenchmarkTargetConfig, GenerationConfig, Ope
 
 MAX_OPENROUTER_ATTEMPTS = 4
 OPENROUTER_RETRY_BASE_SECONDS = 10
+
+
+@dataclass
+class OpenRouterGenerationResult:
+    text: str
+    duration_seconds: float
+    response_id: str | None
+    response_model: str | None
+    usage: dict[str, Any]
 
 
 def _normalize_content(content: Any) -> str:
@@ -77,15 +87,16 @@ def _payload(
     return payload
 
 
-def generate_openrouter_completion(
+def generate_openrouter_result(
     target: BenchmarkTargetConfig,
     prompt: str,
     system_prompt: str | None,
     generation: GenerationConfig,
     config: OpenRouterConfig,
-) -> str:
+) -> OpenRouterGenerationResult:
     last_error: Exception | None = None
     for attempt in range(1, MAX_OPENROUTER_ATTEMPTS + 1):
+        started = time.perf_counter()
         try:
             response = requests.post(
                 f"{config.api_base.rstrip('/')}/chat/completions",
@@ -117,6 +128,28 @@ def generate_openrouter_completion(
         content = message.get("content")
         if content is None:
             raise RuntimeError(f"OpenRouter response did not include message content: {payload}")
-        return _normalize_content(content)
+        return OpenRouterGenerationResult(
+            text=_normalize_content(content),
+            duration_seconds=time.perf_counter() - started,
+            response_id=payload.get("id"),
+            response_model=payload.get("model"),
+            usage=payload.get("usage") or {},
+        )
 
     raise RuntimeError(f"OpenRouter failed for model {target.model}: {last_error}")
+
+
+def generate_openrouter_completion(
+    target: BenchmarkTargetConfig,
+    prompt: str,
+    system_prompt: str | None,
+    generation: GenerationConfig,
+    config: OpenRouterConfig,
+) -> str:
+    return generate_openrouter_result(
+        target=target,
+        prompt=prompt,
+        system_prompt=system_prompt,
+        generation=generation,
+        config=config,
+    ).text

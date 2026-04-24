@@ -4,12 +4,14 @@ import argparse
 from pathlib import Path
 
 from remotion_pipeline.benchmark import run_benchmark
+from remotion_pipeline.cli_candidates import register_candidate_commands
 from remotion_pipeline.compare import compare_runs
 from remotion_pipeline.dataset import build_dataset
 from remotion_pipeline.dataset_sources import resolve_dataset_source
 from remotion_pipeline.eval import evaluate_adapter
 from remotion_pipeline.hf_dataset import export_hf_dataset
 from remotion_pipeline.mlx import train_adapter
+from remotion_pipeline.source_verifier import verify_source_cases
 from remotion_pipeline.types import BenchmarkConfig, ExperimentConfig
 from remotion_pipeline.utils import append_tsv, resolve_path, write_json
 
@@ -193,6 +195,26 @@ def cmd_export_hf_dataset(args: argparse.Namespace) -> None:
     print(payload)
 
 
+def cmd_verify_source(args: argparse.Namespace) -> None:
+    config, repo_root = _load_config(Path(args.config))
+    source = _resolve_source_from_args(repo_root, config.source_dataset, args)
+    payload = verify_source_cases(
+        source=source,
+        repo_root=repo_root,
+        runtime=config.evaluation.runtime,
+        timeout_seconds=config.evaluation.max_render_seconds,
+        render_enabled=not args.no_render,
+        max_cases=args.max_cases,
+    )
+    if args.output:
+        output_path = resolve_path(repo_root, args.output)
+        write_json(output_path, payload)
+        print(f"Source verification written to {output_path}")
+    print(payload["summary"])
+    if payload["summary"]["failure_count"]:
+        raise SystemExit(1)
+
+
 def _add_source_override_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--source")
     parser.add_argument("--source-kind", choices=["local", "hf"])
@@ -204,10 +226,18 @@ def _add_source_override_args(parser: argparse.ArgumentParser) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(prog="python -m remotion_pipeline.cli")
     subparsers = parser.add_subparsers(dest="command", required=True)
-    for name in ("build-dataset", "train", "eval", "run", "benchmark", "export-hf-dataset"):
+    for name in (
+        "build-dataset",
+        "train",
+        "eval",
+        "run",
+        "benchmark",
+        "export-hf-dataset",
+        "verify-source",
+    ):
         subparser = subparsers.add_parser(name)
         subparser.add_argument("--config", required=True)
-        if name in {"build-dataset", "run", "export-hf-dataset"}:
+        if name in {"build-dataset", "run", "export-hf-dataset", "verify-source"}:
             _add_source_override_args(subparser)
         if name == "eval":
             subparser.add_argument("--base-only", action="store_true")
@@ -221,13 +251,15 @@ def main() -> None:
             subparser.add_argument("--task-category", action="append")
             subparser.add_argument("--size-category", action="append")
             subparser.add_argument("--tag", action="append")
+        if name == "verify-source":
+            subparser.add_argument("--output")
+            subparser.add_argument("--max-cases", type=int, default=0)
+            subparser.add_argument("--no-render", action="store_true")
     compare_parser = subparsers.add_parser("compare")
     compare_parser.add_argument("--config", required=True)
     compare_parser.add_argument("--baseline", required=True)
     compare_parser.add_argument("--candidate", required=True)
     compare_parser.add_argument("--output", required=True)
-
-    args = parser.parse_args()
     commands = {
         "build-dataset": cmd_build_dataset,
         "train": cmd_train,
@@ -236,7 +268,11 @@ def main() -> None:
         "compare": cmd_compare,
         "benchmark": cmd_benchmark,
         "export-hf-dataset": cmd_export_hf_dataset,
+        "verify-source": cmd_verify_source,
     }
+    register_candidate_commands(subparsers, commands)
+
+    args = parser.parse_args()
     commands[args.command](args)
 
 

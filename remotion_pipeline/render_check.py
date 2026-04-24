@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from remotion_pipeline.types import RemotionRuntimeConfig
+from remotion_pipeline.utils import ensure_parent
 
 NAMED_EXPORT_PATTERN = re.compile(
     r"export\s+(?:const|function)\s+(?P<name>[A-Z][A-Za-z0-9_]*)"
@@ -134,6 +135,7 @@ def run_remotion_check(
     default_props: dict[str, Any] | None,
     timeout_seconds: int,
     render_enabled: bool,
+    artifact_output_path: Path | None = None,
 ) -> RemotionCheckResult:
     normalized_code = normalize_generated_code(code)
     export_info = detect_export_info(normalized_code)
@@ -213,6 +215,8 @@ def run_remotion_check(
                 render_log_tail=_extract_log_tail(combined_output),
                 render_mode=effective_render_mode,
             )
+        if artifact_output_path is not None and output_path.exists():
+            ensure_parent(artifact_output_path).write_bytes(output_path.read_bytes())
         return RemotionCheckResult(
             compile_ok=True,
             render_ok=True if render_enabled else None,

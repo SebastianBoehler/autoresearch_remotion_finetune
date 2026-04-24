@@ -17,6 +17,8 @@ Useful public material exists, but it is not a clean substitute for an owned dat
 Use these sources first:
 
 - `data/remotion_seed_cases.json`: small, hand-authored seed cases owned by this repo.
+- `data/remotion_codex_synthetic_cases.jsonl`: current Codex-authored synthetic v1 dataset generated from readable templates.
+- `data/generation_prompts/remotion_learning_app_prompts.jsonl`: first-party prompt bank for OpenRouter candidate generation.
 - Prompt-history exports from your learning-app or Remotion prompt app, converted via `scripts/export_prompt_history_to_cases.py`.
 - Codex-generated examples that are reviewed, rendered, deduplicated, and tagged with `license: MIT` only when they do not copy protected third-party examples.
 
@@ -34,6 +36,17 @@ Minimum source metadata:
 
 Do not train on unlicensed public snippets just because they compile. A renderable sample is not automatically a legally clean sample.
 
+## Synthetic Generation Protocol
+
+Synthetic rows should be generated from first principles and public principles, not copied code:
+
+- Use Remotion docs and examples only to understand APIs and common patterns.
+- Author completions as original TSX templates under `data/synthetic/templates/`.
+- Describe each case in `data/synthetic/codex_manifest.json`.
+- Regenerate the JSONL with `scripts/build_codex_synthetic_dataset.py`.
+- Keep `source_name`, `source_model`, `synthetic_generation_method`, and `inspiration_sources` in every row.
+- Run render verification before promoting a batch for training.
+
 ## Scaling Plan
 
 1. Grow seed cases across task classes: typography, charts, chat UI, abstract loops, explainers, product cards, social posts.
@@ -42,3 +55,6 @@ Do not train on unlicensed public snippets just because they compile. A renderab
 4. Add a near-duplicate pass before export so one visual trope does not dominate the adapter.
 5. Keep a public dataset card strict: disclose row licenses, source types, render checks, and known limitations.
 
+## Candidate Rating
+
+Remote model generations should enter the repo as `pending-human-review`, not as final training data. Use `generate-candidates` to collect rendered outputs, rate them in `rating_queue.jsonl`, then use `promote-rated-cases` to produce a high-quality training source.

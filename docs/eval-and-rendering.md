@@ -38,6 +38,13 @@ This keeps the training repo renderer-agnostic. A future `gmotion` backend shoul
 
 ## Recommended Commands
 
+Verify the canonical source cases before training:
+
+```bash
+uv run python -m remotion_pipeline.cli verify-source \
+  --config configs/qwen25coder_3b_remotion.json
+```
+
 ```bash
 uv run python -m remotion_pipeline.cli build-dataset \
   --config configs/qwen25coder_3b_remotion.json
@@ -52,4 +59,3 @@ node scripts/render-check.mjs \
   --mode bundle \
   --frame 5
 ```
-
