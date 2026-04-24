@@ -18,7 +18,8 @@ from remotion_pipeline.utils import ensure_dir, load_records, slugify, write_jso
 CANDIDATE_SYSTEM_PROMPT = (
     f"{DEFAULT_SYSTEM_PROMPT} Make the animation visually polished, deterministic, "
     "and self-contained. Do not use CSS transitions, external network data, browser globals, "
-    "or arbitrary third-party packages."
+    "arbitrary third-party packages, or Remotion Composition registrations. Export the visual "
+    "component itself, not a Root or Composition wrapper."
 )
 
 
@@ -136,15 +137,21 @@ def _generate_one(
         render_enabled=render_enabled,
         artifact_output_path=preview_path if render_enabled else None,
     )
+    required_ratio = _required_snippet_ratio(case)
+    forbidden_ok = _forbidden_snippets_ok(case)
     case["candidate_compile_ok"] = check.compile_ok
     case["candidate_render_ok"] = check.render_ok
-    if not check.compile_ok or check.render_ok is False:
+    case["candidate_required_snippet_ratio"] = required_ratio
+    case["candidate_forbidden_ok"] = forbidden_ok
+    if not check.compile_ok or check.render_ok is False or required_ratio < 1 or not forbidden_ok:
         case["candidate_status"] = "failed-verification"
     return case, {
         "case_id": case_id,
         "model": model,
         "compile_ok": check.compile_ok,
         "render_ok": check.render_ok,
+        "required_snippet_ratio": required_ratio,
+        "forbidden_ok": forbidden_ok,
         "preview_path": str(preview_path.relative_to(output_dir)),
         "compile_log_tail": check.compile_log_tail,
         "render_log_tail": check.render_log_tail,
@@ -189,6 +196,8 @@ def _candidate_case(
         "candidate_status": "needs-human-rating",
         "candidate_compile_ok": None,
         "candidate_render_ok": None,
+        "candidate_required_snippet_ratio": None,
+        "candidate_forbidden_ok": None,
         "candidate_preview_path": str(preview_path),
         "rating_decision": "unrated",
         "human_rating": None,
@@ -206,6 +215,17 @@ def _candidate_case(
 
 def _rating_record(case: dict[str, Any]) -> dict[str, Any]:
     return {**case, "human_rating": None, "rating_decision": "unrated", "human_notes": ""}
+
+
+def _required_snippet_ratio(case: dict[str, Any]) -> float:
+    required = case.get("must_contain", [])
+    if not required:
+        return 1.0
+    return sum(1 for snippet in required if snippet in case["completion"]) / len(required)
+
+
+def _forbidden_snippets_ok(case: dict[str, Any]) -> bool:
+    return all(snippet not in case["completion"] for snippet in case.get("must_not_contain", []))
 
 
 def _verification_payload(prompt_path: Path, verification: list[dict[str, Any]]) -> dict[str, Any]:

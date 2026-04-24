@@ -44,6 +44,8 @@ PASSTHROUGH_FIELDS = [
     "candidate_status",
     "candidate_compile_ok",
     "candidate_render_ok",
+    "candidate_required_snippet_ratio",
+    "candidate_forbidden_ok",
     "candidate_preview_path",
     "rating_decision",
     "human_rating",

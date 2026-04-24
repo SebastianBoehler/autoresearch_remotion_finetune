@@ -21,6 +21,11 @@ def promote_rated_cases(
     for record in load_records(input_path):
         if record.get("candidate_compile_ok") is False or record.get("candidate_render_ok") is False:
             continue
+        if record.get("candidate_forbidden_ok") is False:
+            continue
+        required_ratio = record.get("candidate_required_snippet_ratio")
+        if isinstance(required_ratio, (int, float)) and required_ratio < 1:
+            continue
         rating = _parse_rating(record.get("human_rating"))
         decision = str(record.get("rating_decision") or "").strip().lower()
         if decision in REJECT_DECISIONS:
