@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 from pathlib import Path
 
 from remotion_pipeline.candidate_generation import generate_openrouter_candidate_batch
@@ -20,6 +21,9 @@ def register_candidate_commands(subparsers, commands: dict) -> None:
     generate.add_argument("--source-name", default="openrouter-synthetic-candidates")
     generate.add_argument("--api-key-env", default="OPENROUTER_API_KEY")
     generate.add_argument("--route")
+    generate.add_argument("--max-tokens", type=int)
+    generate.add_argument("--reasoning-effort")
+    generate.add_argument("--exclude-reasoning", action="store_true")
     generate.add_argument("--no-render", action="store_true")
     commands["generate-candidates"] = cmd_generate_candidates
 
@@ -35,13 +39,21 @@ def cmd_generate_candidates(args: argparse.Namespace) -> None:
     config_path = Path(args.config).resolve()
     config = ExperimentConfig.load(config_path)
     repo_root = config_path.parent.parent
+    generation = config.generation
+    if args.max_tokens is not None:
+        generation = replace(generation, max_tokens=args.max_tokens)
     payload = generate_openrouter_candidate_batch(
         prompt_path=Path(args.prompts).resolve(),
         models=args.model,
         output_dir=Path(args.output_dir).resolve(),
         repo_root=repo_root,
-        generation=config.generation,
-        openrouter=OpenRouterConfig(api_key_env=args.api_key_env, route=args.route),
+        generation=generation,
+        openrouter=OpenRouterConfig(
+            api_key_env=args.api_key_env,
+            route=args.route,
+            reasoning_effort=args.reasoning_effort,
+            reasoning_exclude=True if args.exclude_reasoning else None,
+        ),
         runtime=config.evaluation.runtime,
         timeout_seconds=config.evaluation.max_render_seconds,
         samples_per_prompt=args.samples_per_prompt,

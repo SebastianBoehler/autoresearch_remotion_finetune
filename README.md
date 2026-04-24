@@ -90,7 +90,8 @@ uv run python -m remotion_pipeline.cli generate-candidates \
   --prompts data/generation_prompts/remotion_learning_app_prompts.jsonl \
   --output-dir artifacts/candidates/learning-app-v1 \
   --model "<openrouter-model-id>" \
-  --samples-per-prompt 1
+  --samples-per-prompt 1 \
+  --max-tokens 12000
 ```
 
 Run one end-to-end experiment:

@@ -138,6 +138,8 @@ class OpenRouterConfig:
     timeout_seconds: int = 180
     route: str | None = None
     transforms: list[str] = field(default_factory=list)
+    reasoning_effort: str | None = None
+    reasoning_exclude: bool | None = None
 
 
 @dataclass

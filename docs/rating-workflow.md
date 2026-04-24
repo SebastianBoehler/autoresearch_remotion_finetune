@@ -13,7 +13,8 @@ uv run python -m remotion_pipeline.cli generate-candidates \
   --output-dir artifacts/candidates/learning-app-v1 \
   --model "<xiaomi-pro-openrouter-model-id>" \
   --model "<gpt-5.5-openrouter-model-id>" \
-  --samples-per-prompt 1
+  --samples-per-prompt 1 \
+  --max-tokens 12000
 ```
 
 The command writes:

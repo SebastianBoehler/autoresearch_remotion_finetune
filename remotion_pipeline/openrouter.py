@@ -84,6 +84,13 @@ def _payload(
     route = target.route or config.route
     if route:
         payload["route"] = route
+    if config.reasoning_effort is not None or config.reasoning_exclude is not None:
+        reasoning: dict[str, Any] = {}
+        if config.reasoning_effort is not None:
+            reasoning["effort"] = config.reasoning_effort
+        if config.reasoning_exclude is not None:
+            reasoning["exclude"] = config.reasoning_exclude
+        payload["reasoning"] = reasoning
     return payload
 
 
