@@ -1,0 +1,19 @@
+{
+  "name": "remotion-eval-runner",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "dependencies": {
+    "@remotion/cli": "4.0.439",
+    "@remotion/bundler": "4.0.439",
+    "@remotion/renderer": "4.0.439",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.439"
+  },
+  "devDependencies": {
+    "@types/node": "20.12.14",
+    "@types/react": "19.2.7",
+    "typescript": "5.9.3"
+  }
+}

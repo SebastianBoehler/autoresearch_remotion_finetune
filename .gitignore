@@ -1,0 +1,9 @@
+__pycache__/
+.venv/
+artifacts/
+results.tsv
+runner/node_modules/
+runner/package-lock.json
+runner/renders/
+runner/out/
+runner/render-output.png

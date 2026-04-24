@@ -1,0 +1,47 @@
+[
+  {
+    "case_id": "metrics_pulse_card",
+    "tags": ["seed", "dashboard", "ui", "duration:3s"],
+    "prompt": "Create a Remotion component for a dashboard hero card that animates a large KPI from 78 to 91 with a small green delta badge, a dark background, and a subtle spring entrance.",
+    "must_contain": ["useCurrentFrame", "interpolate", "AbsoluteFill"],
+    "must_not_contain": ["fetch(", "axios"],
+    "duration_in_frames": 90,
+    "fps": 30,
+    "width": 1280,
+    "height": 720,
+    "completion": "import React from \"react\";\nimport { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from \"remotion\";\n\nexport const MetricsPulseCard: React.FC = () => {\n  const frame = useCurrentFrame();\n  const { fps } = useVideoConfig();\n  const entrance = spring({ frame, fps, config: { damping: 18, stiffness: 160 } });\n  const metric = Math.round(interpolate(frame, [0, 60], [78, 91], { extrapolateLeft: \"clamp\", extrapolateRight: \"clamp\" }));\n\n  return (\n    <AbsoluteFill style={{ backgroundColor: \"#07111f\", justifyContent: \"center\", alignItems: \"center\", fontFamily: \"Inter, sans-serif\" }}>\n      <div style={{ width: 760, borderRadius: 32, padding: 48, backgroundColor: \"#0f1b2e\", color: \"white\", transform: `scale(${0.92 + entrance * 0.08})`, boxShadow: \"0 30px 80px rgba(0,0,0,0.35)\" }}>\n        <div style={{ fontSize: 20, letterSpacing: 2, textTransform: \"uppercase\", opacity: 0.7 }}>Weekly Activation</div>\n        <div style={{ display: \"flex\", alignItems: \"center\", gap: 20, marginTop: 18 }}>\n          <div style={{ fontSize: 120, fontWeight: 700, lineHeight: 1 }}>{metric}</div>\n          <div style={{ padding: \"10px 16px\", borderRadius: 999, backgroundColor: \"#163a2f\", color: \"#8ef0bb\", fontSize: 28, fontWeight: 600 }}>+16.7%</div>\n        </div>\n      </div>\n    </AbsoluteFill>\n  );\n}",
+    "entry_component": "MetricsPulseCard",
+    "license": "MIT",
+    "source_repo_path": "data/remotion_seed_cases.json"
+  },
+  {
+    "case_id": "three_bar_story",
+    "tags": ["seed", "chart", "explainer", "duration:4s"],
+    "prompt": "Create a Remotion component that reveals a three-bar chart for onboarding, activation, and retention. Use a warm off-white background, charcoal labels, a coral accent, and staggered bar growth.",
+    "must_contain": ["useCurrentFrame", "spring", "map("],
+    "must_not_contain": ["document.", "window."],
+    "duration_in_frames": 120,
+    "fps": 30,
+    "width": 1280,
+    "height": 720,
+    "completion": "import React from \"react\";\nimport { AbsoluteFill, spring, useCurrentFrame, useVideoConfig } from \"remotion\";\n\nconst ITEMS = [\n  { label: \"Onboarding\", value: 68 },\n  { label: \"Activation\", value: 84 },\n  { label: \"Retention\", value: 57 },\n];\n\nexport const ThreeBarStory: React.FC = () => {\n  const frame = useCurrentFrame();\n  const { fps } = useVideoConfig();\n\n  return (\n    <AbsoluteFill style={{ backgroundColor: \"#f6f1e8\", padding: 88, fontFamily: \"Inter, sans-serif\", color: \"#1f1f1f\" }}>\n      <div style={{ fontSize: 58, fontWeight: 700 }}>Funnel Health Snapshot</div>\n      <div style={{ display: \"flex\", gap: 36, alignItems: \"flex-end\", flex: 1, marginTop: 48 }}>\n        {ITEMS.map((item, index) => {\n          const progress = spring({ frame: frame - index * 8, fps, config: { damping: 16, stiffness: 140 } });\n          return (\n            <div key={item.label} style={{ flex: 1, display: \"flex\", flexDirection: \"column\", justifyContent: \"flex-end\", gap: 18 }}>\n              <div style={{ fontSize: 34, fontWeight: 700 }}>{item.value}%</div>\n              <div style={{ height: Math.max(18, item.value * 4 * progress), borderRadius: 24, backgroundColor: index === 1 ? \"#ef6c57\" : \"#2a2a2a\" }} />\n              <div style={{ fontSize: 28 }}>{item.label}</div>\n            </div>\n          );\n        })}\n      </div>\n    </AbsoluteFill>\n  );\n}",
+    "entry_component": "ThreeBarStory",
+    "license": "MIT",
+    "source_repo_path": "data/remotion_seed_cases.json"
+  },
+  {
+    "case_id": "quote_card_focus_pull",
+    "tags": ["seed", "typography", "social", "duration:3s"],
+    "prompt": "Create a Remotion quote card animation with one editorial sentence, a small byline, a cream background, black typography, and a gentle focus-pull entrance.",
+    "must_contain": ["useCurrentFrame", "spring", "fontFamily"],
+    "must_not_contain": ["fetch(", "setTimeout("],
+    "duration_in_frames": 90,
+    "fps": 30,
+    "width": 1080,
+    "height": 1350,
+    "completion": "import React from \"react\";\nimport { AbsoluteFill, spring, useCurrentFrame, useVideoConfig } from \"remotion\";\n\nexport const QuoteCardFocusPull: React.FC = () => {\n  const frame = useCurrentFrame();\n  const { fps } = useVideoConfig();\n  const reveal = spring({ frame, fps, config: { damping: 18, stiffness: 120 } });\n\n  return (\n    <AbsoluteFill style={{ backgroundColor: \"#f6efe6\", justifyContent: \"center\", padding: 72, fontFamily: \"Inter, sans-serif\", color: \"#111111\" }}>\n      <div style={{ transform: `scale(${0.96 + reveal * 0.04})`, filter: `blur(${(1 - reveal) * 8}px)` }}>\n        <div style={{ fontSize: 76, lineHeight: 1.08, fontWeight: 700, maxWidth: 820 }}>\n          Good motion makes the idea feel inevitable before the words finish explaining it.\n        </div>\n        <div style={{ marginTop: 32, fontSize: 28, letterSpacing: 2, textTransform: \"uppercase\", opacity: 0.7 }}>\n          Design Notes\n        </div>\n      </div>\n    </AbsoluteFill>\n  );\n}",
+    "entry_component": "QuoteCardFocusPull",
+    "license": "MIT",
+    "source_repo_path": "data/remotion_seed_cases.json"
+  }
+]

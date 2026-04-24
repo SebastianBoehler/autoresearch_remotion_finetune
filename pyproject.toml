@@ -1,0 +1,15 @@
+[project]
+name = "autoresearch-remotion-finetune"
+version = "0.1.0"
+description = "Mac-friendly MLX LoRA experiments for Remotion code generation"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "datasets>=4.3.0",
+    "huggingface-hub>=0.36.0",
+    "mlx-lm[train]>=0.31.1; sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "requests>=2.32.0",
+]
+
+[tool.uv]
+package = true
