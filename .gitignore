@@ -1,5 +1,8 @@
 __pycache__/
 .venv/
+uv.lock
+.learnings/
+.journal/
 artifacts/
 results.tsv
 runner/node_modules/
