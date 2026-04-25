@@ -175,7 +175,7 @@ uv run python scripts/run_verified_retry_eval.py \
   --retry 1.0,0.8,42
 ```
 
-Run the current recommended adaptive quality profile, which routes known prompt families to the fallback most likely to pass and only uses staged backups when that fallback still fails:
+Run the current recommended adaptive quality profile, which routes known prompt families to the fallback most likely to pass, then uses failure diagnostics from the last attempt to skip wasted backup decoders:
 
 ```bash
 uv run python scripts/run_verified_retry_eval.py \
@@ -218,6 +218,7 @@ Current local checkpoint and 42-case expansion status:
 - Max-quality multi-retry mode on the same fixed eval: 20/20 compile and render, mean score `0.9492`, retry rate `0.30`, mean attempt count `1.45`, selected token ceiling rate `0.0`
 - Adaptive max-quality mode on the same fixed eval: 20/20 compile and render, mean score `0.9492`, retry rate `0.30`, mean attempt count `1.30`, selected token ceiling rate `0.0`, mean total generation wall `19.07s`
 - Routed-primary adaptive mode on the same fixed eval: 20/20 compile and render, mean score `0.9492`, retry rate `0.0`, mean attempt count `1.0`, selected token ceiling rate `0.0`, mean total generation wall `13.35s`
+- Signal-aware retry routing keeps the fixed eval at 20/20 and reduced the arbitrary KPI-strip smoke prompt from 3 attempts to 2 attempts by routing a missing-`fps` spring failure directly to the long high-variance decoder.
 - Held-out 35-case split eval with `temperature=0.5`, `top_p=0.8`: 3/6 compile and render, mean score `0.6167`, token ceiling rate `0.1667`
 - Held-out base-model eval on the same split: 0/6 compile and render, mean score `0.175`
 - Local adapter latency benchmark on 5 warmed samples: mean TTFT `0.189s`, mean wall `15.51s`, about `44.8` generated tokens/sec end-to-end

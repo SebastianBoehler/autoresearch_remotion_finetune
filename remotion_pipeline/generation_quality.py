@@ -19,6 +19,7 @@ class GenerationQualitySignals:
     animated_namespace: bool
     array_as_interpolate_value: bool
     non_numeric_interpolate_range: bool
+    spring_missing_fps: bool
     object_render_error: bool
 
     def to_dict(self) -> dict:
@@ -45,6 +46,7 @@ def analyze_generation_quality(
         animated_namespace="<animated." in code or "</animated." in code,
         array_as_interpolate_value=bool(re.search(r"interpolate\(\[[A-Za-z_]\w*\]", code)),
         non_numeric_interpolate_range=_has_non_numeric_interpolate_signal(code, log),
+        spring_missing_fps='"fps" must be a number' in log,
         object_render_error="React error #31" in log or "args[]=object%20with%20keys" in log,
     )
 

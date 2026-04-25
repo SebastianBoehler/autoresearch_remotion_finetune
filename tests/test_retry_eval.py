@@ -78,6 +78,18 @@ def test_fixed_eval_adaptive_retry_routes_prompt_families() -> None:
     assert general_retry[-1].max_tokens == 1200
 
 
+def test_fixed_eval_retry_uses_failure_quality_signals() -> None:
+    selector = fixed_eval_retry_selector(GenerationConfig(seed=42, max_tokens=900))
+
+    retry = selector(
+        _record("Create a Remotion KPI strip"),
+        [_attempt({"spring_missing_fps": True})],
+    )
+
+    assert retry[0].temperature == 1.0
+    assert retry[0].max_tokens == 1200
+
+
 def test_fixed_eval_primary_selector_routes_known_failure_families() -> None:
     generation = GenerationConfig(seed=42, max_tokens=900)
     selector = fixed_eval_primary_selector(generation)
@@ -93,3 +105,7 @@ def test_fixed_eval_primary_selector_routes_known_failure_families() -> None:
 
 def _record(prompt: str) -> dict:
     return {"messages": [{"role": "user", "content": prompt}]}
+
+
+def _attempt(signals: dict) -> dict:
+    return {"result": {"quality_signals": signals}}

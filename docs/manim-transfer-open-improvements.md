@@ -46,7 +46,9 @@ Transferred now:
 
 - Added a cheap artifact rescore path that re-evaluates stored outputs without paying MLX generation time again.
 - Added generation-quality diagnostics for known failure modes without changing the generated code.
+- Reused those diagnostics for retry routing only: failed attempts are not edited, but the next fresh generation can skip backup decoders that are unlikely to address the observed failure class.
 - Confirmed no-repair rescore of `qwen25coder-3b-remotion-fixed-eval-current.json` exactly preserves the original fixed-eval metrics: `14/20` compile/render, mean score `0.7798`.
+- Signal-aware retry routing kept routed fixed eval at `20/20` and reduced the arbitrary KPI-strip smoke prompt from 3 attempts to 2 attempts after detecting a missing-`fps` Remotion `spring()` failure.
 
 ## High-Priority Open Work For Remotion
 

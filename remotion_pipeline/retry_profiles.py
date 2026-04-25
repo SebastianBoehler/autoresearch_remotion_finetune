@@ -50,6 +50,11 @@ def fixed_eval_retry_selector(
 
     def select(record: dict[str, Any], attempts: list[dict[str, Any]]) -> list[GenerationConfig]:
         prompt = _prompt_text(record)
+        signals = _latest_quality_signals(attempts)
+        if _needs_long_retry(signals):
+            return [profiles["manufacturing_long"], profiles["general_long"], profiles["kpi_long"]]
+        if _needs_structural_retry(signals):
+            return [profiles["general"], profiles["kpi"], profiles["manufacturing_long"]]
         if _is_kpi(prompt):
             return [profiles["kpi"], profiles["general"], profiles["manufacturing_long"]]
         if _is_manufacturing(prompt):
@@ -93,6 +98,34 @@ def _profile_generations(generation: GenerationConfig) -> dict[str, GenerationCo
             max_tokens=extended_tokens,
         ),
     }
+
+
+def _latest_quality_signals(attempts: list[dict[str, Any]]) -> dict[str, Any]:
+    if not attempts:
+        return {}
+    return attempts[-1].get("result", {}).get("quality_signals", {}) or {}
+
+
+def _needs_long_retry(signals: dict[str, Any]) -> bool:
+    return any(
+        bool(signals.get(name))
+        for name in ("likely_token_ceiling", "likely_unclosed_syntax", "spring_missing_fps")
+    )
+
+
+def _needs_structural_retry(signals: dict[str, Any]) -> bool:
+    return any(
+        bool(signals.get(name))
+        for name in (
+            "top_level_hook_call",
+            "undefined_export_name",
+            "missing_sparkline_width",
+            "animated_namespace",
+            "array_as_interpolate_value",
+            "non_numeric_interpolate_range",
+            "object_render_error",
+        )
+    )
 
 
 def _prompt_text(record: dict[str, Any]) -> str:

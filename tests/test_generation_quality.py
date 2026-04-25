@@ -25,3 +25,12 @@ def test_generation_quality_flags_runtime_interpolate_and_object_errors() -> Non
 
     assert signals.non_numeric_interpolate_range
     assert signals.object_render_error
+
+
+def test_generation_quality_flags_missing_spring_fps() -> None:
+    signals = analyze_generation_quality(
+        code='const value = spring({frame, from: 0, to: 1});',
+        render_log_tail='Error: "fps" must be a number',
+    )
+
+    assert signals.spring_missing_fps
