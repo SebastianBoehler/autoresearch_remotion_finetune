@@ -34,6 +34,7 @@ def build_synthetic_records(
     inspiration_sources = manifest.get("inspiration_sources", [])
     if not isinstance(inspiration_sources, list):
         raise ValueError("Manifest field `inspiration_sources` must be a list.")
+    manifest_source_model = str(manifest.get("source_model", source_model))
 
     records = [
         _build_record(
@@ -41,7 +42,7 @@ def build_synthetic_records(
             base_dir=base_dir,
             row_license=row_license,
             source_name=source_name,
-            source_model=source_model,
+            source_model=manifest_source_model,
             inspiration_sources=inspiration_sources,
         )
         for entry in manifest["cases"]
@@ -103,7 +104,7 @@ def _build_record(
         "default_props": entry.get("default_props", {}),
         "license": row_license,
         "source_name": source_name,
-        "source_model": source_model,
+        "source_model": entry.get("source_model", source_model),
         "source_rating": entry.get("source_rating", "codex-authored"),
         "source_repo_path": str(Path(entry["template_path"])),
         "synthetic_generation_method": entry.get(

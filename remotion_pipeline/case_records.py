@@ -7,9 +7,11 @@ from typing import Any, Iterable
 from remotion_pipeline.types import DatasetFilterConfig, SplitConfig
 
 DEFAULT_SYSTEM_PROMPT = (
-    "You write runnable Remotion React/TSX components. "
+    "You write compact runnable Remotion React/TSX components. "
     "Return only TSX code, start with imports, export exactly one component, "
-    "and rely only on React plus Remotion packages."
+    "and rely only on React plus Remotion packages. Keep the component concise "
+    "and syntactically complete with closed JSX. Use spring(...) from remotion "
+    "when spring motion is needed; never import or call useSpring."
 )
 DEFAULT_DURATION_IN_FRAMES = 90
 DEFAULT_FPS = 30
@@ -46,6 +48,9 @@ PASSTHROUGH_FIELDS = [
     "candidate_render_ok",
     "candidate_required_snippet_ratio",
     "candidate_forbidden_ok",
+    "candidate_line_count",
+    "candidate_line_count_ok",
+    "candidate_ascii_ok",
     "candidate_preview_path",
     "candidate_preview_frame",
     "rating_decision",
@@ -211,9 +216,6 @@ def prepare_cases(
 def case_to_chat_record(case: dict[str, Any]) -> dict[str, Any]:
     record = {
         "case_id": case["case_id"],
-        "system": case["system"],
-        "prompt": case["prompt"],
-        "completion": case["completion"],
         "tags": case["tags"],
         "entry_component": case["entry_component"],
         "duration_in_frames": case["duration_in_frames"],

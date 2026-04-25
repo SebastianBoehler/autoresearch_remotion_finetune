@@ -1,0 +1,94 @@
+{
+  "description": "GPT-5.5 Codex-authored repair samples for broad fixed-eval failure modes: hooks inside components, no top-level JSX constants, closed exports, and safe object mapping.",
+  "source_model": "codex-gpt-5.5",
+  "inspiration_sources": [
+    "Local fixed eval failures from qwen25coder-3b-remotion-fixed-eval-current.json",
+    "Remotion deterministic SVG/interpolate patterns with compact complete JSX"
+  ],
+  "cases": [
+    {
+      "case_id": "synthetic_repair_finance_market_line",
+      "prompt": "Create a compact Remotion finance dashboard with one animated SVG revenue line, visible points, and three KPI badges.",
+      "template_path": "templates/repair_finance_market_line.tsx",
+      "tags": ["synthetic-v5", "repair", "finance", "svg", "dashboard", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "POINTS.map", "strokeDashoffset"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "useSpring", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_repair_finance_kpi_strip",
+      "prompt": "Create a Remotion KPI strip with three revenue metric cards, a tiny sparkline, and a green status badge.",
+      "template_path": "templates/repair_finance_kpi_strip.tsx",
+      "tags": ["synthetic-v5", "repair", "finance", "kpi", "svg", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "METRICS.map", "svg"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "useSpring", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_repair_legal_contract_diff",
+      "prompt": "Create a Remotion legal contract diff review with three before-and-after rows, red strikeouts, and green safer replacement clauses.",
+      "template_path": "templates/repair_legal_contract_diff.tsx",
+      "tags": ["synthetic-v5", "repair", "legal", "diff", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "ROWS.map", "line-through"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "useSpring", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_repair_security_path",
+      "prompt": "Create a Remotion cybersecurity attack path map with five connected SVG nodes, a red path reveal, and a green containment node.",
+      "template_path": "templates/repair_security_path.tsx",
+      "tags": ["synthetic-v5", "repair", "security", "svg", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "svg", "NODES.map"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "useSpring", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_repair_insurance_matrix",
+      "prompt": "Create a Remotion insurance claims risk matrix with severity and frequency axes, four claim categories, and a reserve-risk badge.",
+      "template_path": "templates/repair_insurance_matrix.tsx",
+      "tags": ["synthetic-v5", "repair", "insurance", "matrix", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "CLAIMS.map"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "useSpring", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_repair_manufacturing_oee",
+      "prompt": "Create a Remotion manufacturing OEE dashboard with three SVG gauges, downtime bars, and a line status strip.",
+      "template_path": "templates/repair_manufacturing_oee.tsx",
+      "tags": ["synthetic-v5", "repair", "manufacturing", "svg", "dashboard", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "svg", "GAUGES.map"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "useSpring", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_repair_product_radar",
+      "prompt": "Create a Remotion product launch radar with three SVG rings, a rotating sweep line, and four readiness signal labels.",
+      "template_path": "templates/repair_product_radar.tsx",
+      "tags": ["synthetic-v5", "repair", "product", "radar", "svg", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "svg", "SIGNALS.map"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "useSpring", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    }
+  ]
+}

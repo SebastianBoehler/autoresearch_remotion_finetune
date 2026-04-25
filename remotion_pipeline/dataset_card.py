@@ -13,9 +13,6 @@ def build_dataset_card(metadata: dict[str, Any], output_dir: Path) -> str:
     repo_id = metadata.get("repo_id")
     column_names = [
         "case_id",
-        "system",
-        "prompt",
-        "completion",
         "messages",
         "tags",
         "entry_component",

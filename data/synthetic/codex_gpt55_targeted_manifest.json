@@ -1,0 +1,70 @@
+{
+  "description": "GPT-5.5 Codex-authored compact samples targeting observed loop-prone chart and typewriter prompts.",
+  "source_model": "codex-gpt-5.5",
+  "inspiration_sources": [
+    "Local eval failures: finance charts and typewriter cards should stay short and close JSX early",
+    "Remotion docs: deterministic interpolate and SVG stroke reveal patterns"
+  ],
+  "cases": [
+    {
+      "case_id": "synthetic_compact_market_line_card",
+      "prompt": "Create a compact Remotion market line card with one animated SVG path, visible points, and three KPI badges.",
+      "template_path": "templates/compact_market_line_card.tsx",
+      "tags": ["synthetic-v4", "finance", "dashboard", "svg", "compact", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "POINTS.map", "strokeDashoffset"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "setTimeout(", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_revenue_kpi_strip",
+      "prompt": "Create a Remotion revenue KPI strip with three metric cards, a tiny sparkline, and a status badge.",
+      "template_path": "templates/revenue_kpi_strip.tsx",
+      "tags": ["synthetic-v4", "finance", "kpi", "dashboard", "svg", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "METRICS.map", "svg"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "document.", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_short_typewriter_lesson",
+      "prompt": "Create a concise Remotion typewriter lesson about gradient descent with one headline, one blinking cursor, and one formula chip.",
+      "template_path": "templates/short_typewriter_lesson.tsx",
+      "tags": ["synthetic-v4", "typography", "lesson", "typewriter", "compact", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "slice("],
+      "must_not_contain": ["setTimeout(", "setInterval(", "Math.random", "transition", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_formula_step_reveal",
+      "prompt": "Create a Remotion formula step reveal with three short gradient descent steps, a delayed equation card, and no long paragraphs.",
+      "template_path": "templates/formula_step_reveal.tsx",
+      "tags": ["synthetic-v4", "typography", "lesson", "formula", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "STEPS.map"],
+      "must_not_contain": ["setTimeout(", "setInterval(", "Math.random", "transition", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_badge_progress_spring",
+      "prompt": "Create a Remotion mastery progress display with one horizontal fill bar and three springing badge cards.",
+      "template_path": "templates/badge_progress_spring.tsx",
+      "tags": ["synthetic-v4", "progress", "cards", "spring", "duration:4s"],
+      "must_contain": ["spring", "useCurrentFrame", "useVideoConfig", "BADGES.map"],
+      "must_not_contain": ["useSpring", "fetch(", "axios", "transition", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+{
+  "description": "Codex-authored synthetic Remotion cases covering broader business, science, security, and creator workflows.",
+  "inspiration_sources": [
+    "Remotion docs: deterministic frame-based animation",
+    "Remotion docs: SVG and AbsoluteFill composition patterns",
+    "Local Manim fine-tune repo: dataset diversity and latency evaluation strategy"
+  ],
+  "cases": [
+    {
+      "case_id": "synthetic_market_signal_ticker",
+      "prompt": "Create a Remotion finance dashboard animation with a dark revenue chart, an animated green line, data points, and three metric badges.",
+      "template_path": "templates/market_signal_ticker.tsx",
+      "tags": ["synthetic-v2", "finance", "dashboard", "svg", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "strokeDashoffset", "POINTS.map"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "setTimeout(", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_climate_risk_heatmap",
+      "prompt": "Create a Remotion climate risk heatmap with four rows, five forecast columns, colored risk cells, and a legend bar.",
+      "template_path": "templates/climate_risk_heatmap.tsx",
+      "tags": ["synthetic-v2", "climate", "heatmap", "data-viz", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "CELLS.flatMap"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "document.", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_healthcare_triage_queue",
+      "prompt": "Create a Remotion healthcare operations queue with three patient cards, visible priority levels, and spring-staggered entrances.",
+      "template_path": "templates/healthcare_triage_queue.tsx",
+      "tags": ["synthetic-v2", "healthcare", "operations", "cards", "duration:4s"],
+      "must_contain": ["spring", "useCurrentFrame", "useVideoConfig", "PATIENTS.map"],
+      "must_not_contain": ["fetch(", "axios", "setTimeout(", "transition", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_ai_agent_trace",
+      "prompt": "Create a Remotion AI agent execution trace with four steps, active tool cards, and a progress meter.",
+      "template_path": "templates/ai_agent_trace.tsx",
+      "tags": ["synthetic-v2", "ai-agent", "workflow", "trace", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "STEPS.map"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "setInterval(", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_cyber_attack_path",
+      "prompt": "Create a Remotion cybersecurity attack-path animation with connected nodes, a red path reveal, and a green block node.",
+      "template_path": "templates/cyber_attack_path.tsx",
+      "tags": ["synthetic-v2", "security", "network", "svg", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "NODES.map", "svg"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "window.", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_supply_chain_route_map",
+      "prompt": "Create a Remotion supply-chain route map with an animated route curve, four labeled stops, and status chips.",
+      "template_path": "templates/supply_chain_route_map.tsx",
+      "tags": ["synthetic-v2", "logistics", "route-map", "svg", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "strokeDashoffset", "STOPS.map"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "document.", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_cell_signal_cascade",
+      "prompt": "Create a Remotion biology explainer showing a cell signal cascade from ligand to receptor to kinase to nucleus.",
+      "template_path": "templates/cell_signal_cascade.tsx",
+      "tags": ["synthetic-v2", "biology", "science", "svg", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "SIGNALS.map", "Math.sin"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "setTimeout(", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_contract_diff_review",
+      "prompt": "Create a Remotion legal contract diff review with three before-and-after rows, red strikeouts, and highlighted safer language.",
+      "template_path": "templates/contract_diff_review.tsx",
+      "tags": ["synthetic-v2", "legal", "diff", "review", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "ROWS.map", "line-through"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "document.", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_creator_storyboard_grid",
+      "prompt": "Create a Remotion creator storyboard grid with four panels for hook, demo, proof, and call to action using spring entrances.",
+      "template_path": "templates/creator_storyboard_grid.tsx",
+      "tags": ["synthetic-v2", "creator", "storyboard", "grid", "duration:4s"],
+      "must_contain": ["spring", "useCurrentFrame", "useVideoConfig", "PANELS.map"],
+      "must_not_contain": ["fetch(", "axios", "setTimeout(", "transition", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_product_launch_radar",
+      "prompt": "Create a Remotion product launch readiness radar with three rings, a rotating sweep line, and four readiness signals.",
+      "template_path": "templates/product_launch_radar.tsx",
+      "tags": ["synthetic-v2", "product", "launch", "radar", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "RINGS.map", "SIGNALS.map"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "setInterval(", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_typewriter_formula_card",
+      "prompt": "Create a dark Remotion typewriter lesson card about gradient descent with a blinking cursor and a delayed formula panel.",
+      "template_path": "templates/typewriter_formula_card.tsx",
+      "tags": ["synthetic-v2", "typography", "lesson", "typewriter", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "useVideoConfig", "interpolate", "slice("],
+      "must_not_contain": ["setTimeout(", "setInterval(", "Math.random", "transition", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_typing_term_reveal",
+      "prompt": "Create a square Remotion learning slide where three key terms type in one after another with a cursor.",
+      "template_path": "templates/typing_term_reveal.tsx",
+      "tags": ["synthetic-v2", "typography", "lesson", "typewriter", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "useVideoConfig", "interpolate", "slice("],
+      "must_not_contain": ["setTimeout(", "setInterval(", "Math.random", "transition", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1080,
+      "height": 1080
+    },
+    {
+      "case_id": "synthetic_revenue_sparkline_cards",
+      "prompt": "Create a Remotion revenue sparkline dashboard with an animated line, visible data points, and three metric cards.",
+      "template_path": "templates/revenue_sparkline_cards.tsx",
+      "tags": ["synthetic-v2", "finance", "dashboard", "svg", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "interpolate", "strokeDashoffset", "POINTS.map"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "setTimeout(", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_launch_readiness_checklist",
+      "prompt": "Create a Remotion launch readiness screen with radar rings, a rotating sweep, and a four-item checklist.",
+      "template_path": "templates/launch_readiness_checklist.tsx",
+      "tags": ["synthetic-v2", "product", "launch", "radar", "duration:4s"],
+      "must_contain": ["useCurrentFrame", "useVideoConfig", "interpolate", "spring"],
+      "must_not_contain": ["fetch(", "axios", "Math.random", "setInterval(", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_radial_goal_ring",
+      "prompt": "Create a dark Remotion radial goal ring that fills to seventy-four percent with a large center number.",
+      "template_path": "templates/radial_goal_ring.tsx",
+      "tags": ["synthetic-v2", "svg", "progress", "dashboard", "duration:3s"],
+      "must_contain": ["strokeDashoffset", "interpolate", "useCurrentFrame", "svg"],
+      "must_not_contain": ["fetch(", "Math.random", "document.", "window.", "Composition"],
+      "duration_in_frames": 90,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "case_id": "synthetic_progress_badge_meter",
+      "prompt": "Create a Remotion mastery progress meter with a horizontal fill bar and three springing badge cards.",
+      "template_path": "templates/progress_badge_meter.tsx",
+      "tags": ["synthetic-v2", "progress", "dashboard", "cards", "duration:4s"],
+      "must_contain": ["spring", "useCurrentFrame", "useVideoConfig", "interpolate"],
+      "must_not_contain": ["fetch(", "axios", "transition", "animation", "Composition"],
+      "duration_in_frames": 120,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    }
+  ]
+}
