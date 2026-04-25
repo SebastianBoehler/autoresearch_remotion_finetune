@@ -50,6 +50,15 @@ def build_subprocess_command(
         command.extend(["--adapter-path", str(adapter_path)])
     if generation.top_k > 0:
         command.extend(["--top-k", str(generation.top_k)])
+    if generation.draft_model:
+        command.extend(
+            [
+                "--draft-model",
+                generation.draft_model,
+                "--num-draft-tokens",
+                str(generation.num_draft_tokens),
+            ]
+        )
     if system_prompt:
         command.extend(["--system-prompt", system_prompt])
     return command

@@ -97,6 +97,11 @@ class GenerationConfig:
     top_k: int = 0
     seed: int = 42
     local_transport: str = "in_process"
+    draft_model: str | None = None
+    num_draft_tokens: int = 3
+    dynamic_remotion_stop: bool = False
+    dynamic_stop_min_tokens: int = 180
+    dynamic_stop_require_remotion_import: bool = True
 
 
 @dataclass
@@ -152,6 +157,8 @@ class BenchmarkTargetConfig:
     route: str | None = None
     transforms: list[str] = field(default_factory=list)
     local_transport: str | None = None
+    draft_model: str | None = None
+    num_draft_tokens: int | None = None
 
 
 @dataclass

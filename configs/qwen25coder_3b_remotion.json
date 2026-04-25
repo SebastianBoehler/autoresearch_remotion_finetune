@@ -22,7 +22,7 @@
     "mask_prompt": true,
     "num_layers": 12,
     "batch_size": 1,
-    "iters": 80,
+    "iters": 120,
     "val_batches": 8,
     "learning_rate": 0.00008,
     "steps_per_report": 10,
@@ -39,11 +39,15 @@
     "restore_best_checkpoint": true
   },
   "generation": {
-    "max_tokens": 1800,
-    "temperature": 0.0,
-    "top_p": 0.9,
+    "max_tokens": 900,
+    "temperature": 0.5,
+    "top_p": 0.8,
     "top_k": 0,
-    "seed": 42
+    "seed": 42,
+    "local_transport": "in_process",
+    "dynamic_remotion_stop": true,
+    "dynamic_stop_min_tokens": 180,
+    "dynamic_stop_require_remotion_import": true
   },
   "evaluation": {
     "run_render": true,

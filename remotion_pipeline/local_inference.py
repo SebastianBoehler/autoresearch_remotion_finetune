@@ -6,6 +6,7 @@ from pathlib import Path
 from threading import Lock
 from typing import Any
 
+from remotion_pipeline.dynamic_stop import should_stop_remotion_generation
 from remotion_pipeline.local_inference_cli import build_subprocess_command, parse_verbose_output
 from remotion_pipeline.local_inference_types import LocalGenerationMetrics, LocalGenerationResult
 from remotion_pipeline.types import GenerationConfig
@@ -86,6 +87,8 @@ def _generate_subprocess(
         error = output or result.stderr.strip() or "mlx_lm generate failed"
         raise RuntimeError(error)
     text, metrics = parse_verbose_output(output, wall_seconds)
+    metrics.hit_token_ceiling = _hit_token_ceiling(metrics, generation)
+    metrics.stop_reason = "token_ceiling" if metrics.hit_token_ceiling else "model_eos"
     return LocalGenerationResult(text=text, metrics=metrics)
 
 
@@ -97,6 +100,7 @@ def _generate_in_process(
     generation: GenerationConfig,
 ) -> LocalGenerationResult:
     model, tokenizer = _get_loaded_model(base_model, adapter_path)
+    draft_model = _get_draft_model(generation.draft_model, tokenizer)
     prompt_input, prompt_tokens = _prepare_prompt_input(tokenizer, prompt, system_prompt)
     sampler, mx, stream_generate = _build_runtime_handles(tokenizer, generation)
     mx.random.seed(generation.seed)
@@ -105,17 +109,26 @@ def _generate_in_process(
     first_token_seconds: float | None = None
     text_chunks: list[str] = []
     last_response = None
+    draft_accept_count = 0
+    stop_reason: str | None = None
     for response in stream_generate(
         model,
         tokenizer,
         prompt_input,
         max_tokens=generation.max_tokens,
         sampler=sampler,
+        draft_model=draft_model,
+        num_draft_tokens=generation.num_draft_tokens,
     ):
         if first_token_seconds is None:
             first_token_seconds = time.perf_counter() - start
+        if getattr(response, "from_draft", False):
+            draft_accept_count += 1
         text_chunks.append(response.text)
         last_response = response
+        if _should_stop_stream(text_chunks, generation, response.generation_tokens):
+            stop_reason = "dynamic_remotion_stop"
+            break
 
     wall_seconds = time.perf_counter() - start
     generation_tokens = 0
@@ -128,6 +141,9 @@ def _generate_in_process(
         prompt_tokens_per_second = last_response.prompt_tps
         generation_tokens_per_second = last_response.generation_tps
         peak_memory_gb = last_response.peak_memory
+    if stop_reason is None:
+        finish_reason = getattr(last_response, "finish_reason", None)
+        stop_reason = _native_stop_reason(finish_reason, generation_tokens, generation)
 
     metrics = LocalGenerationMetrics(
         transport="in_process",
@@ -141,6 +157,16 @@ def _generate_in_process(
             generation_tokens / wall_seconds if wall_seconds > 0 else None
         ),
         peak_memory_gb=peak_memory_gb,
+        stop_reason=stop_reason,
+        hit_token_ceiling=stop_reason == "token_ceiling",
+        draft_model=generation.draft_model,
+        num_draft_tokens=generation.num_draft_tokens if generation.draft_model else None,
+        draft_accept_count=draft_accept_count if generation.draft_model else None,
+        draft_accept_rate=(
+            draft_accept_count / generation_tokens
+            if generation.draft_model and generation_tokens > 0
+            else None
+        ),
     )
     return LocalGenerationResult(text="".join(text_chunks), metrics=metrics)
 
@@ -163,6 +189,15 @@ def _get_loaded_model(
     with _MODEL_CACHE_LOCK:
         _MODEL_CACHE[cache_key] = loaded
     return loaded
+
+
+def _get_draft_model(draft_model_name: str | None, tokenizer: Any) -> Any:
+    if not draft_model_name:
+        return None
+    draft_model, draft_tokenizer = _get_loaded_model(draft_model_name, None)
+    if getattr(draft_tokenizer, "vocab_size", None) != getattr(tokenizer, "vocab_size", None):
+        raise ValueError("Draft model tokenizer does not match model tokenizer.")
+    return draft_model
 
 
 def _prepare_prompt_input(
@@ -206,6 +241,39 @@ def _build_runtime_handles(
         xtc_special_tokens=_encode_text(tokenizer, "\n") + list(tokenizer.eos_token_ids),
     )
     return sampler, mx, stream_generate
+
+
+def _should_stop_stream(
+    text_chunks: list[str],
+    generation: GenerationConfig,
+    generation_tokens: int,
+) -> bool:
+    if not generation.dynamic_remotion_stop:
+        return False
+    if generation_tokens < generation.dynamic_stop_min_tokens:
+        return False
+    return should_stop_remotion_generation(
+        "".join(text_chunks),
+        require_remotion_import=generation.dynamic_stop_require_remotion_import,
+    )
+
+
+def _hit_token_ceiling(metrics: LocalGenerationMetrics, generation: GenerationConfig) -> bool | None:
+    if metrics.generation_tokens is None:
+        return None
+    return metrics.generation_tokens >= generation.max_tokens
+
+
+def _native_stop_reason(
+    finish_reason: str | None,
+    generation_tokens: int,
+    generation: GenerationConfig,
+) -> str:
+    if finish_reason == "stop":
+        return "model_eos"
+    if finish_reason == "length":
+        return "token_ceiling"
+    return "token_ceiling" if generation_tokens >= generation.max_tokens else "model_stop"
 
 
 def _encode_text(tokenizer: Any, text: str) -> list[int]:

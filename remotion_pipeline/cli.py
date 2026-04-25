@@ -5,6 +5,7 @@ from pathlib import Path
 
 from remotion_pipeline.benchmark import run_benchmark
 from remotion_pipeline.cli_candidates import register_candidate_commands
+from remotion_pipeline.cli_latency import register_latency_commands
 from remotion_pipeline.compare import compare_runs
 from remotion_pipeline.dataset import build_dataset
 from remotion_pipeline.dataset_sources import resolve_dataset_source
@@ -271,6 +272,7 @@ def main() -> None:
         "verify-source": cmd_verify_source,
     }
     register_candidate_commands(subparsers, commands)
+    register_latency_commands(subparsers, commands)
 
     args = parser.parse_args()
     commands[args.command](args)

@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-from remotion_pipeline.local_inference import generate_completion
+from remotion_pipeline.local_inference import generate_completion_result
 from remotion_pipeline.mlx import evaluate_loss
 from remotion_pipeline.render_check import normalize_generated_code, run_remotion_check
 from remotion_pipeline.types import ExperimentConfig, MetricWeights
@@ -110,7 +110,7 @@ def evaluate_adapter(
         user_prompt = next(
             message["content"] for message in record["messages"] if message["role"] == "user"
         )
-        raw_response = generate_completion(
+        generation_result = generate_completion_result(
             base_model=config.base_model,
             adapter_path=adapter_path,
             prompt=user_prompt,
@@ -118,6 +118,7 @@ def evaluate_adapter(
             generation=config.generation,
             transport=config.generation.local_transport,
         )
+        raw_response = generation_result.text
         code = extract_code(raw_response)
         case_result = score_case(
             case=record,
@@ -133,6 +134,7 @@ def evaluate_adapter(
         case_result["code"] = case_result["final_code"]
         case_result["prompt"] = user_prompt
         case_result["system_prompt"] = system_prompt
+        case_result["generation_metrics"] = generation_result.metrics.to_dict()
         per_case.append(case_result)
 
     compile_rate = sum(item["compile_ok"] for item in per_case) / len(per_case)
@@ -154,6 +156,13 @@ def evaluate_adapter(
             "compile_success_rate": compile_rate,
             "render_success_rate": render_rate,
             "mean_case_score": mean_case_score,
+            "token_ceiling_rate": _metric_true_rate(per_case, "hit_token_ceiling"),
+            "mean_ttft_seconds": _metric_mean(per_case, "ttft_seconds"),
+            "mean_generation_tokens": _metric_mean(per_case, "generation_tokens"),
+            "mean_generation_tokens_per_second": _metric_mean(
+                per_case,
+                "generation_tokens_per_second",
+            ),
         },
         "cases": per_case,
     }
@@ -168,3 +177,21 @@ def evaluate_adapter(
         )
     write_json(output_path, payload)
     return payload
+
+
+def _metric_values(cases: list[dict[str, Any]], key: str) -> list[Any]:
+    return [
+        case["generation_metrics"][key]
+        for case in cases
+        if case.get("generation_metrics", {}).get(key) is not None
+    ]
+
+
+def _metric_mean(cases: list[dict[str, Any]], key: str) -> float | None:
+    values = _metric_values(cases, key)
+    return sum(values) / len(values) if values else None
+
+
+def _metric_true_rate(cases: list[dict[str, Any]], key: str) -> float | None:
+    values = _metric_values(cases, key)
+    return sum(bool(value) for value in values) / len(values) if values else None

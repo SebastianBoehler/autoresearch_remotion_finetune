@@ -1,0 +1,59 @@
+{
+  "name": "local-mlx-remotion-latency",
+  "dataset_dir": "artifacts/datasets/qwen25coder-3b-remotion",
+  "output_dir": "artifacts/benchmarks/local-mlx-remotion-latency",
+  "generation": {
+    "max_tokens": 900,
+    "temperature": 0.5,
+    "top_p": 0.8,
+    "top_k": 0,
+    "seed": 42,
+    "local_transport": "in_process",
+    "dynamic_remotion_stop": true,
+    "dynamic_stop_min_tokens": 180,
+    "dynamic_stop_require_remotion_import": true
+  },
+  "evaluation": {
+    "run_render": false,
+    "max_cases": 4,
+    "max_render_seconds": 120,
+    "allowed_render_regression": 0.05,
+    "min_loss_delta": 0.01,
+    "tie_loss_delta": 0.003,
+    "metric_weights": {
+      "compile": 0.3,
+      "component_export": 0.15,
+      "required_snippets": 0.25,
+      "forbidden_snippets": 0.05,
+      "render": 0.25
+    },
+    "runtime": {
+      "runner_dir": "runner",
+      "composition_id": "EvalComp",
+      "render_mode": "still",
+      "render_frame": 15,
+      "output_extension": "png"
+    }
+  },
+  "targets": [
+    {
+      "name": "base-qwen25coder-3b",
+      "backend": "local",
+      "model": "Qwen/Qwen2.5-Coder-3B-Instruct"
+    },
+    {
+      "name": "remotion-lora-qwen25coder-3b",
+      "backend": "local",
+      "model": "Qwen/Qwen2.5-Coder-3B-Instruct",
+      "adapter_path": "artifacts/adapters/qwen25coder-3b-remotion"
+    },
+    {
+      "name": "remotion-lora-qwen25coder-3b-speculative-0p5b",
+      "backend": "local",
+      "model": "Qwen/Qwen2.5-Coder-3B-Instruct",
+      "adapter_path": "artifacts/adapters/qwen25coder-3b-remotion",
+      "draft_model": "mlx-community/Qwen2.5-Coder-0.5B-Instruct-4bit",
+      "num_draft_tokens": 3
+    }
+  ]
+}
