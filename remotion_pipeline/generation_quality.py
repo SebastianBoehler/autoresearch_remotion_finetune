@@ -5,6 +5,14 @@ from dataclasses import asdict, dataclass
 
 from remotion_pipeline.render_check import detect_export_info
 
+HOOK_CALL_PATTERN = re.compile(r"\buse(?:CurrentFrame|VideoConfig)\s*\(")
+COMPONENT_BODY_PATTERN = re.compile(
+    r"(?:(?:export\s+)?const\s+[A-Z][A-Za-z0-9_]*\s*=\s*"
+    r"(?:\([^)]*\)|[A-Za-z_]\w*)\s*=>|"
+    r"(?:export\s+default\s+)?(?:export\s+)?function\s+"
+    r"[A-Z][A-Za-z0-9_]*\s*\([^)]*\))\s*{"
+)
+
 
 @dataclass
 class GenerationQualitySignals:
@@ -75,9 +83,11 @@ def _has_unclosed_syntax_log(log: str) -> bool:
 
 
 def _has_top_level_hook_call(code: str) -> bool:
-    export_index = _first_component_export_index(code)
-    hook_index = code.find("useCurrentFrame()")
-    return hook_index >= 0 and (export_index < 0 or hook_index < export_index)
+    component_spans = _component_body_spans(code)
+    for match in HOOK_CALL_PATTERN.finditer(code):
+        if not any(start < match.start() < end for start, end in component_spans):
+            return True
+    return False
 
 
 def _has_undefined_default_export(code: str, log: str) -> bool:
@@ -97,18 +107,28 @@ def _has_non_numeric_interpolate_signal(code: str, log: str) -> bool:
     )
 
 
-def _first_component_export_index(code: str) -> int:
-    matches = [
-        index
-        for index in (
-            code.find("export const "),
-            code.find("export function "),
-            code.find("export default "),
-        )
-        if index >= 0
-    ]
-    return min(matches) if matches else -1
-
-
 def _component_names(code: str) -> list[str]:
     return re.findall(r"(?:export\s+)?(?:const|function)\s+([A-Z][A-Za-z0-9_]*)\b", code)
+
+
+def _component_body_spans(code: str) -> list[tuple[int, int]]:
+    spans: list[tuple[int, int]] = []
+    for match in COMPONENT_BODY_PATTERN.finditer(code):
+        start = match.end() - 1
+        end = _matching_closing_brace(code, start)
+        if end is not None:
+            spans.append((start, end))
+    return spans
+
+
+def _matching_closing_brace(code: str, opening_index: int) -> int | None:
+    depth = 0
+    for index in range(opening_index, len(code)):
+        char = code[index]
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                return index
+    return None

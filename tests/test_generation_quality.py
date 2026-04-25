@@ -34,3 +34,19 @@ def test_generation_quality_flags_missing_spring_fps() -> None:
     )
 
     assert signals.spring_missing_fps
+
+
+def test_generation_quality_allows_late_default_exported_component_hooks() -> None:
+    signals = analyze_generation_quality(
+        code="""import { useCurrentFrame } from "remotion";
+
+const Demo = () => {
+  const frame = useCurrentFrame();
+  return <div>{frame}</div>;
+};
+
+export default Demo;
+""",
+    )
+
+    assert not signals.top_level_hook_call

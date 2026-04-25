@@ -32,6 +32,8 @@ def fixed_eval_primary_selector(
         prompt = _prompt_text(record)
         if _is_kpi(prompt):
             return profiles["kpi"]
+        if _is_contract_diff(prompt):
+            return profiles["kpi"]
         if _is_manufacturing(prompt):
             return profiles["manufacturing"]
         if _is_long_trace(prompt):
@@ -142,6 +144,12 @@ def _is_manufacturing(prompt: str) -> bool:
     return "manufacturing" in prompt or "oee" in prompt
 
 
+def _is_contract_diff(prompt: str) -> bool:
+    return "contract diff" in prompt or (
+        "legal" in prompt and ("red" in prompt or "green" in prompt)
+    )
+
+
 def _is_long_trace(prompt: str) -> bool:
     return "tool call" in prompt or "latency chip" in prompt
 
@@ -153,8 +161,6 @@ def _is_general_repair_family(prompt: str) -> bool:
             "market line",
             "finance dashboard",
             "revenue line",
-            "contract diff",
-            "legal",
             "security",
             "attack path",
             "insurance",

@@ -18,7 +18,7 @@ The Remotion repo already has several optimizations that were also valuable in t
 Best recorded Remotion checkpoints:
 
 - Single-pass fixed eval: `14/20` compile/render, mean score `0.7798`, token ceiling `0.15`, mean generation `664.35` tokens.
-- Routed-primary adaptive eval: `20/20` compile/render, mean score `0.9492`, retry rate `0.0`, mean attempt count `1.0`, mean wall `13.35s`, token ceiling `0.0`.
+- Routed-primary adaptive eval after contract-diff KPI routing: `20/20` compile/render, mean score `0.9523`, retry rate `0.0`, mean attempt count `1.0`, mean selected generation `583.9` tokens, token ceiling `0.0`.
 - Local latency benchmark: LoRA mean wall `23.10s`; speculative 0.5B draft mean wall `18.60s` but lower quality on fixed eval.
 - Speculative fixed eval: `11/20` compile/render, mean score `0.6713`, token ceiling `0.30`; do not promote this profile.
 
@@ -49,6 +49,7 @@ Transferred now:
 - Reused those diagnostics for retry routing only: failed attempts are not edited, but the next fresh generation can skip backup decoders that are unlikely to address the observed failure class.
 - Confirmed no-repair rescore of `qwen25coder-3b-remotion-fixed-eval-current.json` exactly preserves the original fixed-eval metrics: `14/20` compile/render, mean score `0.7798`.
 - Signal-aware retry routing kept routed fixed eval at `20/20` and reduced the arbitrary KPI-strip smoke prompt from 3 attempts to 2 attempts after detecting a missing-`fps` Remotion `spring()` failure.
+- Contract-diff prompts now route to the KPI decoder profile on the first attempt. A profile check showed this raised the fixed legal case from `0.875` to `0.9375` while dropping that case from `761` to `588` selected generation tokens, and the arbitrary signing-footer legal prompt now verifies in one attempt.
 
 ## High-Priority Open Work For Remotion
 

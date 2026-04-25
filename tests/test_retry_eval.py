@@ -95,10 +95,11 @@ def test_fixed_eval_primary_selector_routes_known_failure_families() -> None:
     selector = fixed_eval_primary_selector(generation)
 
     assert selector(_record("Create a Remotion KPI strip")).seed == 123
+    assert selector(_record("Create a Remotion legal contract diff")).seed == 123
     assert selector(_record("Create a manufacturing OEE dashboard")).temperature == 1.0
     assert selector(_record("Create an AI trace with tool call nodes")).max_tokens == 1200
-    assert selector(_record("Create a legal contract diff")).temperature == 0.6
     assert selector(_record("Create a finance dashboard with a revenue line")).temperature == 0.6
+    assert selector(_record("Create a legal process explainer")) == generation
     assert selector(_record("Create an AI agent execution trace with plan cards")) == generation
     assert selector(_record("Create a simple radial progress badge")) == generation
 
