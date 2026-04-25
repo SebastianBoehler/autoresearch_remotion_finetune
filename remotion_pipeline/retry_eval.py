@@ -238,4 +238,3 @@ def _rate(cases: list[dict[str, Any]], key: str) -> float | None:
 
 def _mean(values: list[Any]) -> float | None:
     return None if not values else sum(float(value) for value in values) / len(values)
-

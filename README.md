@@ -147,6 +147,15 @@ Sweep generation caps against quality and latency:
 uv run python scripts/run_quality_speed_sweep.py --cap 700 --cap 900 --cap 1200
 ```
 
+Rescore an existing eval artifact without generating new model output:
+
+```bash
+uv run python scripts/rescore_generation_artifact.py \
+  --config configs/qwen25coder_3b_remotion.json \
+  --input artifacts/evals/qwen25coder-3b-remotion-fixed-eval-current.json \
+  --output artifacts/evals/qwen25coder-3b-remotion-fixed-eval-current-quality-rescore.json
+```
+
 Run verified quality mode: generate once with the fast default decoder, render-check it, and retry failures with the alternate decoder:
 
 ```bash

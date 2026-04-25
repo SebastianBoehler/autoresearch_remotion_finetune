@@ -4,6 +4,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+from remotion_pipeline.generation_quality import analyze_generation_quality
 from remotion_pipeline.local_inference import generate_completion_result
 from remotion_pipeline.mlx import evaluate_loss
 from remotion_pipeline.render_check import normalize_generated_code, run_remotion_check
@@ -29,17 +30,18 @@ def score_case(
     timeout_seconds: int,
 ) -> dict[str, Any]:
     normalized_code = normalize_generated_code(code)
-    check = run_remotion_check(
+    check = _run_check(
+        case=case,
         code=normalized_code,
         repo_root=repo_root,
-        runtime=runtime,
-        duration_in_frames=case.get("duration_in_frames", 90),
-        fps=case.get("fps", 30),
-        width=case.get("width", 1280),
-        height=case.get("height", 720),
-        default_props=case.get("default_props", {}),
-        timeout_seconds=timeout_seconds,
         render_enabled=render_enabled,
+        runtime=runtime,
+        timeout_seconds=timeout_seconds,
+    )
+    quality_signals = analyze_generation_quality(
+        code=normalized_code,
+        compile_log_tail=check.compile_log_tail,
+        render_log_tail=check.render_log_tail,
     )
 
     required = case.get("must_contain", [])
@@ -87,6 +89,7 @@ def score_case(
         "weighted_score": weighted_score,
         "final_code": normalized_code,
         "render_mode": check.render_mode,
+        "quality_signals": quality_signals.to_dict(),
     }
 
 
@@ -177,6 +180,29 @@ def evaluate_adapter(
         )
     write_json(output_path, payload)
     return payload
+
+
+def _run_check(
+    *,
+    case: dict[str, Any],
+    code: str,
+    repo_root: Path,
+    render_enabled: bool,
+    runtime,
+    timeout_seconds: int,
+):
+    return run_remotion_check(
+        code=code,
+        repo_root=repo_root,
+        runtime=runtime,
+        duration_in_frames=case.get("duration_in_frames", 90),
+        fps=case.get("fps", 30),
+        width=case.get("width", 1280),
+        height=case.get("height", 720),
+        default_props=case.get("default_props", {}),
+        timeout_seconds=timeout_seconds,
+        render_enabled=render_enabled,
+    )
 
 
 def _metric_values(cases: list[dict[str, Any]], key: str) -> list[Any]:
