@@ -42,6 +42,28 @@ def _normalize_content(content: Any) -> str:
     raise RuntimeError(f"Unsupported OpenRouter message content type: {type(content)!r}")
 
 
+def _summarize_response_error(payload: dict[str, Any]) -> dict[str, Any]:
+    choices = payload.get("choices") or []
+    first_choice = choices[0] if choices else {}
+    message = first_choice.get("message") if isinstance(first_choice, dict) else {}
+    usage = payload.get("usage") or {}
+    completion_details = usage.get("completion_tokens_details") or {}
+    return {
+        "id": payload.get("id"),
+        "model": payload.get("model"),
+        "provider": payload.get("provider"),
+        "finish_reason": first_choice.get("finish_reason") if isinstance(first_choice, dict) else None,
+        "native_finish_reason": (
+            first_choice.get("native_finish_reason") if isinstance(first_choice, dict) else None
+        ),
+        "message_keys": sorted(message.keys()) if isinstance(message, dict) else [],
+        "prompt_tokens": usage.get("prompt_tokens"),
+        "completion_tokens": usage.get("completion_tokens"),
+        "reasoning_tokens": completion_details.get("reasoning_tokens"),
+        "total_tokens": usage.get("total_tokens"),
+    }
+
+
 def _headers(config: OpenRouterConfig) -> dict[str, str]:
     api_key = os.environ.get(config.api_key_env)
     if not api_key:
@@ -130,11 +152,16 @@ def generate_openrouter_result(
         payload = response.json()
         choices = payload.get("choices")
         if not choices:
-            raise RuntimeError(f"OpenRouter response did not include choices: {payload}")
+            raise RuntimeError(
+                f"OpenRouter response did not include choices: {_summarize_response_error(payload)}"
+            )
         message = choices[0].get("message", {})
         content = message.get("content")
         if content is None:
-            raise RuntimeError(f"OpenRouter response did not include message content: {payload}")
+            raise RuntimeError(
+                "OpenRouter response did not include message content: "
+                f"{_summarize_response_error(payload)}"
+            )
         return OpenRouterGenerationResult(
             text=_normalize_content(content),
             duration_seconds=time.perf_counter() - started,

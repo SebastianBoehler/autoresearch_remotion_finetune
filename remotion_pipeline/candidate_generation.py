@@ -4,6 +4,17 @@ from pathlib import Path
 from typing import Any
 
 from remotion_pipeline.case_records import DEFAULT_SYSTEM_PROMPT, prepare_cases
+from remotion_pipeline.candidate_quality import (
+    MAX_CANDIDATE_SOURCE_LINES,
+    forbidden_snippets_ok,
+    preview_frame,
+    rating_record,
+    required_snippet_ratio,
+    runtime_with_preview_frame,
+    source_line_count,
+    verification_payload,
+    write_review_markdown,
+)
 from remotion_pipeline.eval import extract_code
 from remotion_pipeline.openrouter import generate_openrouter_result
 from remotion_pipeline.render_check import run_remotion_check
@@ -21,9 +32,13 @@ CANDIDATE_SYSTEM_PROMPT = (
     "arbitrary third-party packages, or Remotion Composition registrations. Export the visual "
     "component itself, not a Root or Composition wrapper. Maintain strong contrast: primary "
     "text should be clearly readable at 1280x720 preview size, essential labels should not use "
-    "opacity below 0.72, and the midpoint frame should show the main artifact clearly."
+    "opacity below 0.72, and the preview frame should show the main artifact clearly. Keep all "
+    "meaningful labels and panels inside a 48px safe margin at the preview frame with no clipped "
+    "tooltips, cropped progress bars, or overlapping legends. Hard requirement: keep the complete "
+    "TSX under 260 lines, use ASCII-only labels and punctuation, and end with a syntactically "
+    "complete component. If needed, simplify the visual rather than writing more lines. Use compact "
+    "data arrays, shared style helpers, and map calls."
 )
-
 
 def generate_openrouter_candidate_batch(
     *,
@@ -71,10 +86,11 @@ def generate_openrouter_candidate_batch(
 
     prepared_cases = prepare_cases(cases, source_label=str(prompt_path))
     write_jsonl(output_dir / "candidates.jsonl", prepared_cases)
-    write_jsonl(output_dir / "rating_queue.jsonl", [_rating_record(row) for row in prepared_cases])
-    write_json(output_dir / "verification.json", _verification_payload(prompt_path, verification))
-    _write_review_markdown(output_dir / "review.md", prepared_cases)
-    return _verification_payload(prompt_path, verification)
+    write_jsonl(output_dir / "rating_queue.jsonl", [rating_record(row) for row in prepared_cases])
+    payload = verification_payload(prompt_path, verification)
+    write_json(output_dir / "verification.json", payload)
+    write_review_markdown(output_dir / "review.md", prepared_cases)
+    return payload
 
 
 def _load_prompt_specs(path: Path) -> list[dict[str, Any]]:
@@ -126,11 +142,11 @@ def _generate_one(
         sample_index=sample_index,
         preview_path=preview_path.relative_to(output_dir),
     )
-    preview_frame = _preview_frame(case, runtime)
+    preview_frame_value = preview_frame(case, runtime)
     check = run_remotion_check(
         code=code,
         repo_root=repo_root,
-        runtime=_runtime_with_preview_frame(runtime, preview_frame),
+        runtime=runtime_with_preview_frame(runtime, preview_frame_value),
         duration_in_frames=case["duration_in_frames"],
         fps=case["fps"],
         width=case["width"],
@@ -140,14 +156,27 @@ def _generate_one(
         render_enabled=render_enabled,
         artifact_output_path=preview_path if render_enabled else None,
     )
-    required_ratio = _required_snippet_ratio(case)
-    forbidden_ok = _forbidden_snippets_ok(case)
+    required_ratio = required_snippet_ratio(case)
+    forbidden_ok = forbidden_snippets_ok(case)
+    line_count = source_line_count(code)
+    line_count_ok = line_count <= MAX_CANDIDATE_SOURCE_LINES
+    ascii_ok = code.isascii()
     case["candidate_compile_ok"] = check.compile_ok
     case["candidate_render_ok"] = check.render_ok
-    case["candidate_preview_frame"] = preview_frame
+    case["candidate_preview_frame"] = preview_frame_value
     case["candidate_required_snippet_ratio"] = required_ratio
     case["candidate_forbidden_ok"] = forbidden_ok
-    if not check.compile_ok or check.render_ok is False or required_ratio < 1 or not forbidden_ok:
+    case["candidate_line_count"] = line_count
+    case["candidate_line_count_ok"] = line_count_ok
+    case["candidate_ascii_ok"] = ascii_ok
+    if (
+        not check.compile_ok
+        or check.render_ok is False
+        or required_ratio < 1
+        or not forbidden_ok
+        or not line_count_ok
+        or not ascii_ok
+    ):
         case["candidate_status"] = "failed-verification"
     return case, {
         "case_id": case_id,
@@ -156,6 +185,9 @@ def _generate_one(
         "render_ok": check.render_ok,
         "required_snippet_ratio": required_ratio,
         "forbidden_ok": forbidden_ok,
+        "line_count": line_count,
+        "line_count_ok": line_count_ok,
+        "ascii_ok": ascii_ok,
         "preview_path": str(preview_path.relative_to(output_dir)),
         "compile_log_tail": check.compile_log_tail,
         "render_log_tail": check.render_log_tail,
@@ -202,6 +234,9 @@ def _candidate_case(
         "candidate_render_ok": None,
         "candidate_required_snippet_ratio": None,
         "candidate_forbidden_ok": None,
+        "candidate_line_count": None,
+        "candidate_line_count_ok": None,
+        "candidate_ascii_ok": None,
         "candidate_preview_path": str(preview_path),
         "candidate_preview_frame": None,
         "rating_decision": "unrated",
@@ -223,74 +258,5 @@ def _candidate_case(
     }
 
 
-def _rating_record(case: dict[str, Any]) -> dict[str, Any]:
-    return {**case, "human_rating": None, "rating_decision": "unrated", "human_notes": ""}
-
-
-def _required_snippet_ratio(case: dict[str, Any]) -> float:
-    required = case.get("must_contain", [])
-    if not required:
-        return 1.0
-    return sum(1 for snippet in required if snippet in case["completion"]) / len(required)
-
-
-def _forbidden_snippets_ok(case: dict[str, Any]) -> bool:
-    return all(snippet not in case["completion"] for snippet in case.get("must_not_contain", []))
-
-
-def _preview_frame(case: dict[str, Any], runtime: RemotionRuntimeConfig) -> int:
-    if runtime.render_mode != "still":
-        return runtime.render_frame
-    duration = int(case.get("duration_in_frames") or 90)
-    return max(1, min(duration - 1, duration // 2))
-
-
-def _runtime_with_preview_frame(
-    runtime: RemotionRuntimeConfig,
-    preview_frame: int,
-) -> RemotionRuntimeConfig:
-    return RemotionRuntimeConfig(
-        runner_dir=runtime.runner_dir,
-        composition_id=runtime.composition_id,
-        render_mode=runtime.render_mode,
-        render_frame=preview_frame,
-        output_extension=runtime.output_extension,
-    )
-
-
-def _verification_payload(prompt_path: Path, verification: list[dict[str, Any]]) -> dict[str, Any]:
-    total = len(verification)
-    return {
-        "prompt_path": str(prompt_path),
-        "summary": {
-            "candidates": total,
-            "compile_success_rate": _rate(verification, "compile_ok"),
-            "render_success_rate": _rate(verification, "render_ok"),
-        },
-        "cases": verification,
-    }
-
-
-def _rate(rows: list[dict[str, Any]], key: str) -> float | None:
-    attempts = [row for row in rows if row.get(key) is not None]
-    return None if not attempts else sum(bool(row[key]) for row in attempts) / len(attempts)
-
-
 def _candidate_case_id(prompt_id: str, model: str, sample_index: int) -> str:
     return f"cand-{slugify(prompt_id)}-{slugify(model)}-{sample_index}"
-
-
-def _write_review_markdown(path: Path, cases: list[dict[str, Any]]) -> None:
-    lines = ["# Candidate Review", "", "Edit `rating_queue.jsonl` after reviewing renders.", ""]
-    for case in cases:
-        lines.extend(
-            [
-                f"## {case['case_id']}",
-                "",
-                f"- Model: `{case['source_model']}`",
-                f"- Preview: `{case['candidate_preview_path']}`",
-                f"- Prompt: {case['prompt']}",
-                "",
-            ]
-        )
-    path.write_text("\n".join(lines))
