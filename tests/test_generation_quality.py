@@ -50,3 +50,19 @@ export default Demo;
     )
 
     assert not signals.top_level_hook_call
+
+
+def test_generation_quality_allows_lowercase_default_exported_component_hooks() -> None:
+    signals = analyze_generation_quality(
+        code="""import { useCurrentFrame } from "remotion";
+
+const radar = () => {
+  const frame = useCurrentFrame();
+  return <div>{frame}</div>;
+};
+
+export default radar;
+""",
+    )
+
+    assert not signals.top_level_hook_call

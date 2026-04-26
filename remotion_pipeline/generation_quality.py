@@ -12,6 +12,7 @@ COMPONENT_BODY_PATTERN = re.compile(
     r"(?:export\s+default\s+)?(?:export\s+)?function\s+"
     r"[A-Z][A-Za-z0-9_]*\s*\([^)]*\))\s*{"
 )
+DEFAULT_EXPORT_NAME_PATTERN = re.compile(r"\bexport\s+default\s+([A-Za-z_]\w*)\s*;?")
 
 
 @dataclass
@@ -114,6 +115,27 @@ def _component_names(code: str) -> list[str]:
 def _component_body_spans(code: str) -> list[tuple[int, int]]:
     spans: list[tuple[int, int]] = []
     for match in COMPONENT_BODY_PATTERN.finditer(code):
+        start = match.end() - 1
+        end = _matching_closing_brace(code, start)
+        if end is not None:
+            spans.append((start, end))
+    for name in _default_export_names(code):
+        spans.extend(_named_function_body_spans(code, name))
+    return spans
+
+
+def _default_export_names(code: str) -> list[str]:
+    return DEFAULT_EXPORT_NAME_PATTERN.findall(code)
+
+
+def _named_function_body_spans(code: str, name: str) -> list[tuple[int, int]]:
+    pattern = re.compile(
+        rf"(?:const\s+{re.escape(name)}\s*=\s*"
+        r"(?:\([^)]*\)|[A-Za-z_]\w*)\s*=>|"
+        rf"function\s+{re.escape(name)}\s*\([^)]*\))\s*{{"
+    )
+    spans: list[tuple[int, int]] = []
+    for match in pattern.finditer(code):
         start = match.end() - 1
         end = _matching_closing_brace(code, start)
         if end is not None:

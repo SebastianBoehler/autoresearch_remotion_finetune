@@ -34,10 +34,18 @@ def fixed_eval_primary_selector(
             return profiles["kpi"]
         if _is_contract_diff(prompt):
             return profiles["kpi"]
+        if _is_robotics_warehouse(prompt):
+            return profiles["kpi"]
+        if _is_long_visual_graph(prompt):
+            return profiles["manufacturing_long"]
+        if _is_tool_card_trace(prompt):
+            return profiles["general"]
         if _is_manufacturing(prompt):
             return profiles["manufacturing"]
         if _is_long_trace(prompt):
             return profiles["manufacturing_long"]
+        if _is_plain_security_path(prompt):
+            return profiles["base"]
         if _is_general_repair_family(prompt):
             return profiles["general"]
         return generation
@@ -61,6 +69,8 @@ def fixed_eval_retry_selector(
             return [profiles["kpi"], profiles["general"], profiles["manufacturing_long"]]
         if _is_manufacturing(prompt):
             return [profiles["manufacturing"], profiles["general_long"], profiles["kpi_long"]]
+        if _is_security_path(prompt):
+            return [profiles["base"], profiles["kpi"], profiles["manufacturing_long"]]
         return [profiles["general"], profiles["kpi"], profiles["manufacturing_long"]]
 
     return select
@@ -69,6 +79,7 @@ def fixed_eval_retry_selector(
 def _profile_generations(generation: GenerationConfig) -> dict[str, GenerationConfig]:
     extended_tokens = max(generation.max_tokens, 1200)
     return {
+        "base": generation,
         "general": retry_generation_from_config(
             generation, temperature=0.6, top_p=0.75, seed=42
         ),
@@ -148,6 +159,35 @@ def _is_contract_diff(prompt: str) -> bool:
     return "contract diff" in prompt or (
         "legal" in prompt and ("red" in prompt or "green" in prompt)
     )
+
+
+def _is_robotics_warehouse(prompt: str) -> bool:
+    return "robotics" in prompt and "warehouse" in prompt
+
+
+def _is_long_visual_graph(prompt: str) -> bool:
+    return any(
+        marker in prompt
+        for marker in (
+            "polished remotion finance dashboard",
+            "edtech concept map",
+            "knowledge nodes",
+            "sports performance radar",
+            "retention cohort",
+        )
+    )
+
+
+def _is_tool_card_trace(prompt: str) -> bool:
+    return "tool card" in prompt or "active tool" in prompt
+
+
+def _is_security_path(prompt: str) -> bool:
+    return "cybersecurity" in prompt or "attack path" in prompt
+
+
+def _is_plain_security_path(prompt: str) -> bool:
+    return _is_security_path(prompt) and "svg" not in prompt
 
 
 def _is_long_trace(prompt: str) -> bool:

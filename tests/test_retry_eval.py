@@ -96,12 +96,27 @@ def test_fixed_eval_primary_selector_routes_known_failure_families() -> None:
 
     assert selector(_record("Create a Remotion KPI strip")).seed == 123
     assert selector(_record("Create a Remotion legal contract diff")).seed == 123
+    assert selector(_record("Create a robotics warehouse route visualization")).seed == 123
+    assert selector(_record("Create an edtech concept map with knowledge nodes")).max_tokens == 1200
+    assert selector(_record("Create an AI trace with active tool cards")).temperature == 0.6
     assert selector(_record("Create a manufacturing OEE dashboard")).temperature == 1.0
     assert selector(_record("Create an AI trace with tool call nodes")).max_tokens == 1200
+    assert selector(_record("Create a cybersecurity attack path map")) == generation
     assert selector(_record("Create a finance dashboard with a revenue line")).temperature == 0.6
+    assert selector(_record("Create a cybersecurity attack path map with SVG nodes")).temperature == 0.6
     assert selector(_record("Create a legal process explainer")) == generation
     assert selector(_record("Create an AI agent execution trace with plan cards")) == generation
     assert selector(_record("Create a simple radial progress badge")) == generation
+
+
+def test_fixed_eval_retry_can_try_base_profile_for_security_paths() -> None:
+    generation = GenerationConfig(seed=42, max_tokens=900)
+    selector = fixed_eval_retry_selector(generation)
+
+    retries = selector(_record("Create a cybersecurity attack path map"), [])
+
+    assert retries[0] == generation
+    assert retries[1].seed == 123
 
 
 def _record(prompt: str) -> dict:

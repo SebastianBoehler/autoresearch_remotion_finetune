@@ -19,6 +19,7 @@ Best recorded Remotion checkpoints:
 
 - Single-pass fixed eval: `14/20` compile/render, mean score `0.7798`, token ceiling `0.15`, mean generation `664.35` tokens.
 - Routed-primary adaptive eval after contract-diff KPI routing: `20/20` compile/render, mean score `0.9523`, retry rate `0.0`, mean attempt count `1.0`, mean selected generation `583.9` tokens, token ceiling `0.0`.
+- Frontier prompt-bank eval: `26/26` compile/render after prompt-family routing, mean score `0.9689`, retry rate `0.0`, mean selected and total generation `644.3` tokens.
 - Local latency benchmark: LoRA mean wall `23.10s`; speculative 0.5B draft mean wall `18.60s` but lower quality on fixed eval.
 - Speculative fixed eval: `11/20` compile/render, mean score `0.6713`, token ceiling `0.30`; do not promote this profile.
 
@@ -50,6 +51,7 @@ Transferred now:
 - Confirmed no-repair rescore of `qwen25coder-3b-remotion-fixed-eval-current.json` exactly preserves the original fixed-eval metrics: `14/20` compile/render, mean score `0.7798`.
 - Signal-aware retry routing kept routed fixed eval at `20/20` and reduced the arbitrary KPI-strip smoke prompt from 3 attempts to 2 attempts after detecting a missing-`fps` Remotion `spring()` failure.
 - Contract-diff prompts now route to the KPI decoder profile on the first attempt. A profile check showed this raised the fixed legal case from `0.875` to `0.9375` while dropping that case from `761` to `588` selected generation tokens, and the arbitrary signing-footer legal prompt now verifies in one attempt.
+- Added a frontier prompt-bank eval builder and used it to route observed arbitrary-prompt families: robotics warehouse to KPI, active tool-card traces to general, long visual graph prompts to the long manufacturing profile, and plain security-path prompts to the base profile. This moved the 26-case frontier eval from `25/26` verified with `23.1%` retries to `26/26` verified with `0%` retries.
 
 ## High-Priority Open Work For Remotion
 
